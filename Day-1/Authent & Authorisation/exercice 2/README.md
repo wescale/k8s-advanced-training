@@ -19,7 +19,7 @@ To apply your modification, do rke up and check if the cluster is still accessib
 
 - We need to authenticate the user from kubectl. We will take the help of k8s-oidc-helper to generate a token and the same token can be pasted in the console to generate the .kube config for our user:
 
-``sh
+```sh
 ./k8s-oidc-helper --client-id xxx   --client-secret xxx   --write=true
 ```
 
