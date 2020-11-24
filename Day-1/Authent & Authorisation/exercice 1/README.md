@@ -31,9 +31,9 @@ kubectl get secret <name token> -n wsc-kubernetes-training-sa -o yaml
 
 There are several key/value pairs under the data key of this Secret:
 
-- ca.crt is the Base64 encoding of the cluster certificate.
-- namespace is the Base64 encoding of the current namespace.
-- token is the Base64 encoding of the JWT used to authenticate against the API server.
+ - ca.crt is the Base64 encoding of the cluster certificate.
+ - namespace is the Base64 encoding of the current namespace.
+ - token is the Base64 encoding of the JWT used to authenticate against the API server.
 
 Let’s focus on the token and try to decode it: use command line base64 and jwt.io. 
 Look on the payload:
