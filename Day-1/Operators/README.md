@@ -1,6 +1,6 @@
-# exercise: Operators
+# Hands-on: Operators
 
-During this exercice we will install a mysql operator to create mysql cluster and manage backups to google cloud storage
+During this exercice we will install a mysql operator to create mysql cluster and manage backups to minio S3 bucket
 
 ## Installing Mysql Operator
 
@@ -81,3 +81,4 @@ export POD_NAME=$(kubectl get pods --namespace default -l "release=minio" -o jso
 kubectl port-forward $POD_NAME 9000
 ```
 URL: http://127.0.0.1:9000/minio/mysql/
+

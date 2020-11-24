@@ -1,4 +1,4 @@
-# exercise: Istio
+# Hands-on: Istio
 
 Istio hand-on
 
@@ -39,9 +39,9 @@ Deploy apache (deployment and service):
 kubectl apply -f apache.yaml -n mesh
 ```
 
-If we get the pods we will see that there 2 containers, an envoy side car was injected
+If we get the pods we will see that there are 2 containers, an envoy side car was injected
 
-Now we will expose our deployment throug the ingress gateway:
+Now we will expose our deployment through the ingress gateway:
 Create the http gateway
 ```sh
 kubectl apply -f gateway.yaml -n istio-system
@@ -63,7 +63,7 @@ curl  http://$INGRESS_HOST/apache -I -v
 
 ## Fault injection
 
-Now we will test failure injection, to do so we will inject a delay of 7s on ngnix
+Now we will test failure injection, to do so we will inject a delay of 7s on nginx
 ```sh
 kubectl apply -f web-vs-delay.yaml -n mesh
 ```
@@ -111,7 +111,7 @@ kubectl apply -f bookinfo-vs.yaml -n mesh
 
 Generate trafic 
 ```sh
-watch -n 1 curl -o /dev/null -s -w %{http_code} $GATEWAY_URL/productpage
+watch -n 1 curl -o /dev/null -s -w %{http_code} http://$INGRESS_HOST/productpage
 ```
 
 Observe with Kiali
