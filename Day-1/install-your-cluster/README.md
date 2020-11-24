@@ -62,7 +62,7 @@ Examine the DaemonSet to answer the following questions:
 
 Try to connect to the exposed Nginx.
 
-For that, you have a DNS record: `lb.wsc-kubernetes-training-X.wescaletraining.fr`
+For that, you have a DNS record has been given to join the worker nodes.
 
 ## StorageClass and provisionenr
 
