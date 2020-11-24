@@ -146,7 +146,7 @@ spec:
  ```
 
  - Within your namespace, inside the new Pod, try to you use the token for your new sa to list all the Pods:  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods and 
- https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods
+ https://kubernetes.default.svc/api/v1/namespaces/default/pods
  
  What do you notice ?
 If there is a problem, how to resolve it ?
