@@ -12,7 +12,7 @@ You will use (Rancher Kubernetes Engine - RKE)[https://rancher.com/docs/rke/late
 
 RKE is already installed on the bastion.
 
-To connect on the bastion instance, start an ssh agent, then ssh to it:
+To connect on the bastion instance, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) start an ssh agent, then ssh to it:
 ```sh
 `eval "$(ssh-agent -s)"`
 ssh-add kubernetes-formation
@@ -53,14 +53,15 @@ rke cert rotate
 
 ## IngressController
 
-Look at the `ingress-nginx` namespace.
+Look at the resoucres deployed on the `ingress-nginx` namespace.
 
-Examine the Daemonset to answer the following questions:
+Examine the DaemonSet to answer the following questions:
 * Where are the nginx pods running?
 * How is that achieved?
 * What are the ports they exposed?
 
 Try to connect to the exposed Nginx.
+
 For that, you have a DNS record: `lb.wsc-kubernetes-training-X.wescaletraining.fr`
 
 ## StorageClass and provisionenr
@@ -76,11 +77,13 @@ kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisione
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 ```
 
-Inspect the config maps of the related namespace, to determine where the persistent volumes will be created.
+Inspect the config maps of the related namespace, to determine where this StorageClass will create the persistent volumes.
 
-What happens if the node is lost?
+You can connect to the kubernetes nodes `ssh -F provided_ssh_config worker-0-training-X` to see their file system and mount points.
 
-What could you suggest to optimize this?
+Questions:
+* What happens if the node is lost?
+* What could you suggest to optimize this?
 
 ## Activate the audit logs
 
@@ -89,7 +92,7 @@ Activating the audit logs of the api server is the only way to know who or what 
 For, that you have an example of configuration for RKE in `audit.yml`. Look at this file, in particular the `rules`.
 
 * Append the `audit.yml` to your `cluster.yml`
-* Run `rke up`to update the cluster.
+* Run `rke up` to update the cluster.
 
 Now, you can see relevant actions in `/var/log/kube-audit/audit-log.json` of control plane nodes.
 
@@ -105,11 +108,11 @@ Now connect to any master node and look for the delete operation.
 
 ## Update Strategy
 
-Any cluster will need to be updated at amoment.
-Different possibilities will discuss later but in the case of updating an existing cluster, the strategy must designed.
+Any cluster will need to be updated at a moment.
+Different possibilities will be discussed later but in the case of an update of an existing cluster, the strategy must be carefully thought.
 
 Look at the `update_strategy` section of the current `cluster.yml` file.
-A parameter is not acceptabkle for the production.
+A parameter is not acceptable for the production.
 
 Which one?
 
@@ -124,9 +127,21 @@ services:
     backup_config:
       interval_hours: 1
       retention: 6
+      s3backupconfig:
+        access_key: S3_ACCESS_KEY
+        secret_key: S3_SECRET_KEY
+        bucket_name: s3-bucket-name
+        region: ""
+        folder: ""
+        endpoint: s3.amazonaws.com
+        custom_ca: |-
+          -----BEGIN CERTIFICATE-----
+          $CERTIFICATE
+          -----END CERTIFICATE----
+
 ```
 
-Here, we propose to put the cluster in a specific state, then do a one-tilme snapshot and test the cluster restoration:
+Here, we propose to explore backup/restore features. You will put the cluster in a specific state, then do a one-time snapshot and inspect the state after a restore operation:
 
 ```sh
 # run specific pods
@@ -142,7 +157,7 @@ kubectl describe pod important-pod
 ```
 
 
-## Labels pour domain of failure / topology key
+## Labels your domain of failure / topology key
 
 Each node (control plane or data plane) is deployed in a given zone of the Google Cloud Platform.
 
@@ -152,3 +167,15 @@ With kubectl, describe the nodes and look for this information.
 Can you find it?
 
 What do you suggest to correct that?
+
+## Capacity of the cluster
+
+Connect to a master node to view the `cidrs`of the cluster:
+```sh
+ssh -F provided_ssh_config master-0-training-X
+sudo su
+ps -ef|grep kube-controller
+```
+
+* What is the max number of Pods created by this cluster?
+* What is the max number of Services created by this cluster?
