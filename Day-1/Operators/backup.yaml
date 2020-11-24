@@ -1,0 +1,9 @@
+apiVersion: mysql.presslabs.org/v1alpha1
+kind: MysqlBackup
+metadata:
+  name: my-db-backup
+
+spec:
+  clusterName: my-db
+  backupURL: s3://mysql/
+  backupSecretName: my-cluster-backup-secret
