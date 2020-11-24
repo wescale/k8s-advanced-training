@@ -1,5 +1,0 @@
-services:
-  etcd:
-    backup_config:
-      interval_hours: 1
-      retention: 6
