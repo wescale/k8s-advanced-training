@@ -1,4 +1,4 @@
-# Hands-on: Operators
+# Hands-on: Scheduling
 
 During this lab we will experience some scenarios of Pod scheduling constraints
 
@@ -84,3 +84,8 @@ k get pods -l app=pause
 ```
 
 Can you explain what happened ?
+
+Delete all the created resources:
+```sh
+kubectl delete -f .
+```

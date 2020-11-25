@@ -141,3 +141,10 @@ istioctl dashboard grafana
 Multiple graphs are available explore them
 
 http://localhost:3000/d/LJ_uJAvmk/istio-service-dashboard?orgId=1&refresh=1m&var-datasource=default&var-service=productpage.mesh.svc.cluster.local&var-srcns=All&var-srcwl=All&var-dstns=All&var-dstwl=All
+
+
+
+Delete all the created resources:
+```sh
+kubectl delete ns mesh istio-system
+```
