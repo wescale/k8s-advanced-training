@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-00
+  labels:
+    app: app0
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    kubernetes.io/hostname: worker-0
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-01
+  labels:
+    app: app0
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    kubernetes.io/hostname: worker-1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-11
+  labels:
+    app: app1
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    kubernetes.io/hostname: worker-1
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-12
+  labels:
+    app: app1
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  nodeSelector:
+    kubernetes.io/hostname: worker-2
