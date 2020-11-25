@@ -2,7 +2,8 @@ This exercice aims to  configure the cluster kubernetes through OIDC(OpenID Conn
 
 # Create OAuth Client in Google & modify the api-server of the Kube
 
- - Go to https://console.cloud.google.com/apis/credentials and create the Client ID, and Secret. While creating the Client ID, select the app type as Desktop App. Once generated, download the JSON file.
+ - You don't need to do this step. It's already done. Ask the trainer for the Client-id and client-secret.
+ Go to https://console.cloud.google.com/apis/credentials and create the Client ID, and Secret. While creating the Client ID, select the app type as Desktop App. Once generated, download the JSON file.
 
 - Modify /home/training/cluster.yml to add the idp details:
 

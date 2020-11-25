@@ -5,6 +5,7 @@ metadata:
  namespace: wsc-kubernetes-training-sa
 spec:
  serviceAccountName: training-sa
+ containers:
  - name: alpine
    image: alpine:3.9
    command:

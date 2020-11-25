@@ -29,13 +29,13 @@ kubectl get sa default -n wsc-kubernetes-training-sa -o yaml
 kubectl get secret <name token> -n wsc-kubernetes-training-sa -o yaml
  ```
 
-There are several key/value pairs under the data key of this Secret:
+There are several key/value pairs under the data key of this Secret. The key that interests us is token:
 
- - ca.crt is the Base64 encoding of the cluster certificate.
- - namespace is the Base64 encoding of the current namespace.
- - token is the Base64 encoding of the JWT used to authenticate against the API server.
+- ca.crt is the Base64 encoding of the cluster certificate.
+- namespace is the Base64 encoding of the current namespace.
+- token is the Base64 encoding of the JWT used to authenticate against the API server.
 
-Let’s focus on the token and try to decode it: use command line base64 and jwt.io. 
+Let’s focus on the token and try to decode it: use command line base64(or https://www.base64decode.org/) and jwt.io. 
 Look on the payload:
 
 ```sh
@@ -118,6 +118,6 @@ spec:
  - Within your namespace, inside the new Pod, try to you use the token for your new sa to list all the Pods:  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods and 
  https://kubernetes.default.svc/api/v1/namespaces/default/pods
  
- What do you notice ?
-If there is a problem, how to resolve it ?
+What do you notice when you call the api namespaces/default/pods ?
+What is the solution to solve this ?
 

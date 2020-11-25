@@ -34,13 +34,13 @@ kubectl get sa default -n wsc-kubernetes-training-sa -o yaml
 kubectl get secret <name token> -n wsc-kubernetes-training-sa -o yaml
  ```
 
-There are several key/value pairs under the data key of this Secret:
+There are several key/value pairs under the data key of this Secret. The key that interests us is token:
 
 - ca.crt is the Base64 encoding of the cluster certificate.
 - namespace is the Base64 encoding of the current namespace.
 - token is the Base64 encoding of the JWT used to authenticate against the API server.
 
-Let’s focus on the token and try to decode it: use command line base64 and jwt.io. 
+Let’s focus on the token and try to decode it: use command line base64 (or https://www.base64decode.org/) and jwt.io. 
 Look on the payload:
 
 ```sh
@@ -59,18 +59,19 @@ How to use this default token from within a simple Pod:
 - Create a new Pod in your namespace 
 
 ```sh
-    apiVersion: v1
-    kind: Pod
-    metadata:
-     name: pod-default
-    spec:
-     containers:
-      - name: alpine
-        image: alpine:3.9
-        command:
-        - "sleep"
-        - "10000
-  ```
+apiVersion: v1
+kind: Pod
+metadata:
+ name: pod-default
+ namespace: wsc-kubernetes-training-sa
+spec:
+ containers:
+ - name: alpine
+   image: alpine:3.9
+   command:
+    - "sleep"
+    - "10000"
+```
 
 ```sh
 kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
@@ -97,8 +98,7 @@ The serviceAccountName key is set with the name of the default ServiceAccount.
 The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of volume, in /var/run/secrets/kubernetes.io/serviceaccount
 
 ```sh
-kubectl get po -n wsc-kubernetes-training-sa
-kubectl exec -it pod-default -- sh
+kubectl exec -n wsc-kubernetes-training-sa -it pod-default -- sh
 ls /var/run/secrets/kubernetes.io/serviceaccount
 ```
 
@@ -106,8 +106,7 @@ ls /var/run/secrets/kubernetes.io/serviceaccount
   What do you notice ?
 
 ```sh
-$ kubectl get po -n wsc-kubernetes-training-sa
-$ kubectl exec -it <name pod> -- sh
+$ kubectl exec -n wsc-kubernetes-training-sa -it pod-default -- sh
 # apk add --update curl
 # curl https://kubernetes.default.svc/api/v1 --insecure
 
@@ -127,8 +126,7 @@ $ kubectl exec -it <name pod> -- sh
 - Try from the container to do the same call using the ServiceAccount token
 
 ```sh
-$ kubectl get po -n wsc-kubernetes-training-sa
-$ kubectl exec -it <name pod> -- sh
+$ kubectl exec -n wsc-kubernetes-training-sa -it pod-default -- sh
 # TOKEN=$(cat /run/secrets/kubernetes.io/serviceaccount/token)
 # curl -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/ --insecure
 # curl https://kubernetes.default.svc/api/v1 --insecure
@@ -179,12 +177,12 @@ serviceaccount/training-sa created
 - A ServiceAccount is not that useful unless certain rights are bound to it. Defines a Role allowing to list all the Pods in the your namespace.
 
 What kind of Role do you need ? Role ou ClusterRole ?
-> Role because, Ijust need to list all Pods in my namespace and not in others namespaces.
+> Role because, I just need to list all Pods in my namespace and not in others namespaces.
 
 
 ```sh
 $ kubectl apply -f training-role-sa.yaml
-role/list-pods created
+role.rbac.authorization.k8s.io/list-pods created
 
 $ kubectl get role -n wsc-kubernetes-training-sa
  ```
@@ -216,14 +214,16 @@ spec:
  https://kubernetes.default.svc/api/v1/namespaces/default/pods
  
  ```sh
- $ kubectl get po -n wsc-kubernetes-training-sa
- $ kubectl exec -it pod-sa -- sh
+ $ kubectl exec -n wsc-kubernetes-training-sa -it pod-sa -- sh
 # apk add --update curl
 # TOKEN=$(cat /run/secrets/kubernetes.io/serviceaccount/token)
 # curl -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/ --insecure
 # curl -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods --insecure
-# curl -H "Authorization: Bearer $TOKEN"  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods --insecure
+# curl -H "Authorization: Bearer $TOKEN"  https://kubernetes.default.svc/api/v1/namespaces/default/pods --insecure
   ```
- What do you notice ?
-If there is a problem, how to resolve it ?
+What do you notice when you call the api namespaces/default/pods ?
+=> Yes got a reason Forbidden when call the api namespaces/default/pods 
+
+What is the solution to solve this ?
+Creation of ClusterRole
 
