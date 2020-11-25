@@ -112,3 +112,11 @@ ssh -L 9000:localhost:9000 training@bastion.wsc-kubernetes-training-2.wescaletra
 
 URL: http://localhost:9000/minio/mysql/
 
+
+Delete all the created resources:
+```sh
+kubectl delete -f .
+helm uninstall minio
+helm uninstall mysql-operator
+```
+
