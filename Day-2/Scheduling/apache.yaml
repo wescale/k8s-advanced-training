@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd
+spec:
+  selector:
+    matchLabels:
+      app: apache
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: apache
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - apache
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: httpd
+        image: httpd

@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    app: hello
+    run: web1
+  name: web1
+  namespace: mesh
+spec:
+  selector:
+    matchLabels:
+      run: web1
+  template:
+    metadata:
+      labels:
+        app: hello
+        run: web1
+        version: v1
+    spec:
+      containers:
+      - image: gcr.io/google-samples/hello-app:1.0 #v1
+        imagePullPolicy: IfNotPresent
+        name: web1
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    app: hello
+    run: web2
+  name: web2
+  namespace: mesh
+spec:
+  selector:
+    matchLabels:
+      run: web2
+  template:
+    metadata:
+      labels:
+        app: hello
+        run: web2
+        version: v2
+    spec:
+      containers:
+      - image: gcr.io/google-samples/hello-app:2.0 #v2
+        imagePullPolicy: IfNotPresent
+        name: web2
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: hello
+  name: web
+  namespace: mesh
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: hello #This service is matching the 2 deployments
+  type: ClusterIP

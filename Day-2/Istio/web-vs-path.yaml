@@ -1,0 +1,38 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: web-servers-vs
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - istio-system/http-gateway
+  http:   
+  - match:
+    - uri:
+        prefix: "/nginx"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        port:
+          number: 80
+        host: nginx
+      headers:
+        response:
+          set:
+            vs: "nginx-via-web-vs"
+  - match:
+    - uri:
+        prefix: "/apache"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        port:
+          number: 80
+        host: apache
+      headers:
+        response:
+          set:
+            vs: "httpd-via-web-vs"
