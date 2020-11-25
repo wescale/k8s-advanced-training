@@ -1,9 +1,8 @@
 apiVersion: v1
 kind: Pod
 metadata:
- name: pod-sa
+ name: pod-default
 spec:
- serviceAccountName: demo-sa
  containers:
  - name: alpine
    image: alpine:3.9

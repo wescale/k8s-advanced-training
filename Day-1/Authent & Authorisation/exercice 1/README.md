@@ -87,46 +87,15 @@ and https://kubernetes.default.svc/api/v1/wsc-kubernetes-training-sa/pods
 
 # Create a custom serviceaccount
 
-- Create a the service Account training-sa
-
-```sh
-apiVersion: v1
-kind: ServiceAccount
-metadata:
- name: demo-sa
- ```
+- Create a the service Account training-sa in your namespace
 
 - A ServiceAccount is not that useful unless certain rights are bound to it. Defines a Role allowing to list all the Pods in the your namespace.
 
-```sh
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
- name: list-pods
- namespace: wsc-kubernetes-training-sa
-rules:
- - apiGroups: [""] # "" indicates the core API group
-   resources: ["pods"]
-   verbs: ["list"]
- ```
+What kind of Role do you need ? Role ou ClusterRole ?
+
+- Try to create the Role in your namespace with good rules and verify that it's created
 
 - Try to bind the Role and the ServiceAccount created above
-
-```sh
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
- name: list-pods_demo-sa
- namespace: wsc-kubernetes-training-sa
-roleRef:
- kind: Role
- name: list-pods
- apiGroup: rbac.authorization.k8s.io
-subjects:
- - kind: ServiceAccount
-   name: demo-sa
-   namespace: wsc-kubernetes-training-sa
- ```
 
  - Create a new pod in your namespace using the ServiceAccount within a Pod 
 
