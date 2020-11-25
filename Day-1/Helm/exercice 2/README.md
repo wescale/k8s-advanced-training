@@ -5,7 +5,15 @@ This is a simple two-thirds application: frontend and backend
 
 Rewrite  the different yaml files for this using Chart Helm. You find here:
 
-- namespaces.yaml
+- Create namespace helm-demo 
+```sh
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: helm-demo
+  labels:
+    stage: test
+```
 - frontend-deployment.yaml
 - backend-deployment.yaml
 - frontend-service.yaml
