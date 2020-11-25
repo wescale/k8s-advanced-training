@@ -17,8 +17,6 @@ spec:
       labels:
         app: {{ include "simplebackend.fullname" . }}
     spec:
-      serviceAccountName: 
-        {{ include "simpleapp.serviceAccountName" . }}
       containers:
         - name: {{ include "simplebackend.fullname" . }}
           image: 
@@ -60,8 +58,6 @@ spec:
       labels:
         app: {{ include "simplefrontend.fullname" . }}
     spec:
-      serviceAccountName: 
-        {{ include "simpleapp.serviceAccountName" . }}
       containers:
         - name: {{ include "simplefrontend.fullname" . }}
           image: 
