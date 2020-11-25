@@ -26,7 +26,7 @@ spec:
       headers:
         response:
           set:
-            vs: "via-web-vs-withdelay"
+            vs: "nginx-via-web-vs-withdelay"
   - match:
     - uri:
         prefix: "/apache"
@@ -40,4 +40,4 @@ spec:
       headers:
         response:
           set:
-            vs: "via-web-vs"
+            vs: "httpd-via-web-nodelay"

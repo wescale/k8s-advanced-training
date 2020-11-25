@@ -21,7 +21,7 @@ spec:
       headers:
         response:
           set:
-            vs: "via-web-vs"
+            vs: "nginx-via-web-vs"
   - match:
     - uri:
         prefix: "/apache"
@@ -35,4 +35,4 @@ spec:
       headers:
         response:
           set:
-            vs: "via-web-vs"
+            vs: "httpd-via-web-vs"

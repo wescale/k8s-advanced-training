@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-affinity-pod-hard
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - worker-1
+  containers:
+  - name: with-node-affinity-hard
+    image: k8s.gcr.io/pause:2.0
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-affinity-pod-soft
+spec:
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - worker-10
+  containers:
+  - name: with-node-affinity-soft
+    image: k8s.gcr.io/pause:2.0

@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-topology
+spec:
+  selector:
+    matchLabels:
+      app: pause
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: pause
+    spec:     
+      containers:
+      - name: pod-topology
+        image: k8s.gcr.io/pause:3.1
