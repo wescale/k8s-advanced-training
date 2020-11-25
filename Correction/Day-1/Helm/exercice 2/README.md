@@ -19,3 +19,7 @@ Wz can create our template for deployment in templates/deployment.yaml . This te
 - Create service
 This template will be used to generate both backend-service.yaml and frontend-service.yaml 
 
+- Install the application. And voila you have an application up and running in the kubernetes cluster. Check it out.
+```sh
+$ helm install simpleapp ./sample-demo
+```
