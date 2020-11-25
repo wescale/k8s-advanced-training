@@ -57,14 +57,15 @@ How to use this default token from within a simple Pod:
     apiVersion: v1
     kind: Pod
     metadata:
-     name: pod-default
+    name: pod-default
+    namespace: wsc-kubernetes-training-sa
     spec:
-     containers:
-      - name: alpine
-        image: alpine:3.9
-        command:
+    containers:
+    - name: alpine
+      image: alpine:3.9
+      command:
         - "sleep"
-        - "10000
+        - "10000"
   ```
 
 ```sh
@@ -104,9 +105,9 @@ apiVersion: v1
 kind: Pod
 metadata:
  name: pod-sa
+ namespace: wsc-kubernetes-training-sa
 spec:
- serviceAccountName: demo-sa
- containers:
+ serviceAccountName: training-sa
  - name: alpine
    image: alpine:3.9
    command:

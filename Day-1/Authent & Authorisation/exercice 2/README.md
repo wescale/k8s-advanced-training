@@ -15,7 +15,11 @@ services:
       oidc-client-id: "<client-id>"
 ```
 
-To apply your modification, do rke up and check if the cluster is still accessible.
+- Try apply your modification, do rke up and check if the cluster is still up.
+
+```sh
+kubectl get nodes
+```
 
 - We need to authenticate the user from kubectl. We will take the help of k8s-oidc-helper to generate a token and the same token can be pasted in the console to generate the .kube config for our user:
 
@@ -24,7 +28,7 @@ To apply your modification, do rke up and check if the cluster is still accessib
 ```
 
 Google will generate the code and this has to be copied in the console.
-One copied, we will get a new user added in .kube/config file. 
+One copied, we will get a new user added automatically in .kube/config file. 
 
 Can you verify this ?
 
@@ -32,6 +36,3 @@ Can you verify this ?
 
 - Create a ClusterRoleBinding to attach the clusterRole to your user
 - Try to access the cluster using the new user (option --user)
-
-
-

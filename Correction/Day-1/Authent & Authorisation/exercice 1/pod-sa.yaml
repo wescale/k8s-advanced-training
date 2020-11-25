@@ -2,9 +2,9 @@ apiVersion: v1
 kind: Pod
 metadata:
  name: pod-sa
+ namespace: wsc-kubernetes-training-sa
 spec:
  serviceAccountName: training-sa
- namespace: wsc-kubernetes-training-sa
  - name: alpine
    image: alpine:3.9
    command:
