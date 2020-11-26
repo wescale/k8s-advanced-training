@@ -1,10 +1,10 @@
 # Install your k8s cluster
 
 In this exercise, you will deploy a cluster on Google Compute Engine Virtual Machines.
-Each of you has 6 Virtual machines:
+Each of you has 7 Virtual machines:
 * a bastion accessible using the provided SSH private key and ssh_config file
 * 3 VMs for the control plane
-* 2 VMs for the data plane
+* 7 VMs for the data plane
 
 You will use (Rancher Kubernetes Engine - RKE)[https://rancher.com/docs/rke/latest/en/].
 
@@ -14,12 +14,16 @@ RKE is already installed on the bastion.
 
 To connect on the bastion instance, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) start an ssh agent, then ssh to it:
 ```sh
+chmod 400 kubernetes-formation
 `eval "$(ssh-agent -s)"`
 ssh-add kubernetes-formation
 # Ensure the key is present
 ssh-add -L 
 # SSH
 ssh -F provided_ssh_config bastion-training-X
+cd creds
+# you should see a cluster.yml file
+ls -lath
 ```
 
 Once connected, to the bastion instance, use the provided cluster.yml file.
@@ -60,11 +64,13 @@ Examine the DaemonSet to answer the following questions:
 * How is that achieved?
 * What are the ports they exposed?
 
+Ask your trainer to indicate the public DNS record for the workers!
+
 Try to connect to the exposed Nginx.
 
 For that, you have a DNS record has been given to join the worker nodes.
 
-## StorageClass and provisionenr
+## StorageClass and provisioner
 
 What are the current StorageClasses?
 
@@ -94,7 +100,7 @@ For, that you have an example of configuration for RKE in `audit.yml`. Look at t
 * Append the `audit.yml` to your `cluster.yml`
 * Run `rke up` to update the cluster.
 
-Now, you can see relevant actions in `/var/log/kube-audit/audit-log.json` of control plane nodes.
+Now, you can see relevant actions in `/var/log/kube-audit/audit-log.json` of a *control plane* node.
 
 Perform a test:
 ```sh

@@ -19,9 +19,7 @@ spec:
     spec:
       containers:
         - name: {{ include "simplebackend.fullname" . }}
-          image: 
-            "{{ .Values.backend.image.repository }}:
-            {{ .Values.backend.image.tag | default "latest" }}"
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default "latest" }}"
           imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
           ports:
             - name: http
