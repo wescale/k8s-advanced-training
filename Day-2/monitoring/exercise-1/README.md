@@ -45,6 +45,7 @@ And open the following URLs:
 ### Access the services using additional k8s resources
 
 Create new NodePort Services.
+Open you browser on the DNS for workers (aks the trainer).
 
 ## Add dashboards on Grafana
 
