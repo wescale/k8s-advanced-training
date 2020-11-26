@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: mysql-prom-pod
+  labels:
+    app: wordpress
+    tier: mysql
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: mysql
+  podMetricsEndpoints:
+  - port: exporter
+  podTargetLabels:
+  - app
+  - tier
