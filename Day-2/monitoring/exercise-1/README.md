@@ -63,7 +63,7 @@ Create a pod which exposes metrics endpoints:
 kubectl create -f pod.yaml
 ```
 
-Once the pod is created, view the returned metrics executing a `curl` command on localhost:8080.
+Once the pod is created, view the returned metrics executing a `curl` command on localhost:8080/metrics.
 
 What is the data format expected by Prometheus?
 
