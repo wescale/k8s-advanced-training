@@ -6,13 +6,15 @@ Each of you has 7 Virtual machines:
 * 3 VMs for the control plane
 * 7 VMs for the data plane
 
-You will use (Rancher Kubernetes Engine - RKE)[https://rancher.com/docs/rke/latest/en/].
+In addition of the VMs, the trainer must give you a `provided_ssh_config` file and a number of environment `training-X`
 
 ## Deploy with RKE (10 minutes)
 
+You will use (Rancher Kubernetes Engine - RKE)[https://rancher.com/docs/rke/latest/en/].
+
 RKE is already installed on the bastion.
 
-To connect on the bastion instance, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) start an ssh agent, then ssh to it:
+To connect on the bastion instance, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) start an ssh agent to add the key and connect to the instance:
 ```sh
 chmod 400 kubernetes-formation
 `eval "$(ssh-agent -s)"`
