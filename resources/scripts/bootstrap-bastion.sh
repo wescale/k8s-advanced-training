@@ -15,7 +15,7 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 apt-get update && sudo apt-get install -y google-cloud-sdk kubectl nano unzip git
 gcloud config set compute/zone europe-west1-b
 
-wget -O /usr/bin/rke https://github.com/rancher/rke/releases/download/v1.0.14/rke_linux-amd64
+wget -O /usr/bin/rke https://github.com/rancher/rke/releases/download/v1.1.15/rke_darwin-amd64
 chmod +x /usr/bin/rke
 
 snap install go --classic

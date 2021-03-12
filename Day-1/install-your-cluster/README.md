@@ -187,3 +187,18 @@ ps -ef|grep kube-controller
 
 * What is the max number of Pods created by this cluster?
 * What is the max number of Services created by this cluster?
+
+## Bonus - Networking
+
+Inspect the `cluster.yaml` file to determine the network plugin used by the cluster.
+
+Generally, netwok plugin are configured using Custom Resource Definition - CRDs. Those CRDs are additional Kubernetes objects. 
+To list the available resources on a cluster: `kubectl api-resources`
+### Overlay network. 
+
+As seen, Calico is able to integrate or not overlays (IpInIP or VxLAN). 
+
+In the `kube-system` namespace, look at the `ippools` and `configmap/calico-config` objects. 
+
+* Is there an ovelay network?
+* Is BGP (BIRD) used?
