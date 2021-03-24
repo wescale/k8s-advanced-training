@@ -77,14 +77,16 @@ kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
 The serviceAccountName key is set with the name of the default ServiceAccount.
 The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of volume, in /var/run/secrets/kubernetes.io/serviceaccount
 
-- Try from the container to get information from the API server (dns kubernetes.default.svc) without authentication.
+- Try from the container to get information from the API server (endpoint: `https://kubernetes.default.svc/api/v1`) without authentication.
   What do you notice ?
 
 - Try from the container to do the same call using the ServiceAccount token
 
-- Within your namespace, try to you use this token to list all the Pods: https://kubernetes.default.svc/api/v1/default/pods
-and https://kubernetes.default.svc/api/v1/wsc-kubernetes-training-sa/pods
- What do you notice ?
+- Try to you use this token to list all the Pods 
+  - inside the default namespace: https://kubernetes.default.svc/api/v1/default/pods
+  - inside the current namespace: https://kubernetes.default.svc/api/v1/wsc-kubernetes-training-sa/pods
+
+What do you notice ?
 
 # Create a custom serviceaccount
 

@@ -4,7 +4,7 @@ In this exercise, you will deploy a cluster on Google Compute Engine Virtual Mac
 Each of you has 7 Virtual machines:
 * a bastion accessible using the provided SSH private key and ssh_config file
 * 3 VMs for the control plane
-* 7 VMs for the data plane
+* 3 VMs for the data plane
 
 In addition of the VMs, the trainer must give you a `provided_ssh_config` file and a number of environment `training-X`
 
