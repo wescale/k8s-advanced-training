@@ -3,7 +3,7 @@ This exercice aims to configure the cluster API server to use OpenIDConnect (OID
 As indicated in the following schema, Kubernetes does not perform the OIDC authentication flow of the end-user.
 It just validates the given tokens and eventually refresh them if needed.
 
-SCHEMA !!!
+![oidc-flow](./oidc-flow.png)
 
 For the exercise, you will use the identity provider [https://auth0.com/](https://auth0.com/).
 This SaaS is a standard solution to manage user federation.

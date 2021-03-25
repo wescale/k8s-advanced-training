@@ -1,9 +1,19 @@
-This exercice aims to  configure the cluster kubernetes through OIDC(OpenID Connect) to authenticate and authorize using google account.
+This exercice aims to configure the cluster API server to use OpenIDConnect (OIDC) tokens for user authentication.
 
-# Create OAuth Client in Google & modify the api-server of the Kube
+As indicated in the following schema, Kubernetes does not perform the OIDC authentication flow of the end-user.
+It just validates the given tokens and eventually refresh them if needed.
 
- - You don't need to do this step. It's already done. Ask the trainer for the Client-id and client-secret.
-Go to https://console.cloud.google.com/apis/credentials and create the Client ID, and Secret. While creating the Client ID, select the app type as Desktop App. Once generated, download the JSON file.
+![oidc-flow](./oidc-flow.png)
+
+For the exercise, you will use the identity provider [https://auth0.com/](https://auth0.com/).
+This SaaS is a standard solution to manage user federation.
+It is compliant with several protocols ; in particular with OIDC.
+
+# Create users
+
+- You don't need to do this step. It's already done. Ask the trainer for a login / password of a user existing on the Auth0 domain used for the exercise.
+
+# Enable the OIDC plugin on the api-server
 
 - Modify /home/training/cluster.yml to add the idp details:
 
@@ -11,25 +21,24 @@ Go to https://console.cloud.google.com/apis/credentials and create the Client ID
 services:
   kube-api:
     extra_args:
-      oidc-issuer-url: "https://accounts.google.com"
+      oidc-issuer-url: "https://dev-wexm65ih.eu.auth0.com/"
       oidc-username-claim: "email"
-      oidc-client-id: "<client-id>"
+      oidc-client-id: "HQHSoQZzPW20rrVXWj8MquFdCCJsmLvM"
 ```
 
-- Try apply your modification, do rke up and check if the cluster is still up.
+- Try to apply your modification, do `rke up` and check if the cluster is still up.
 
 ```sh
 kubectl get nodes
 ```
-
-- We need to authenticate the user from kubectl. We will take the help of k8s-oidc-helper to generate a token and the same token can be pasted in the console to generate the .kube config for our user:
+- We need to authenticate the user from kubectl. We will take the help of `k8s-auth-client-helper.sh` to generate tokens and configure kubectl for our user. To run, the helper needs a local file `oidc.k8s-auth-client`. Ask the trainer to provide it.
 
 ```sh
-./k8s-oidc-helper --client-id xxx   --client-secret xxx   --write=true
+./k8s-auth-client-helper.sh
 ```
 
-Google will generate the code and this has to be copied in the console.
-One copied, we will get a new user added automatically in .kube/config file. 
+Auth0 will generate a code this has to be copied in the console.
+One copied, we will get a new entry `oidc-user` in the `users` section of the `.kube/config` file. 
 
 Can you verify this ?
 
@@ -37,6 +46,11 @@ Can you verify this ?
 $ less .kube/config
 ```
 
+- Try to list the nodes of the cluster using the new `oidc-user` user (option --user)
+
+```sh
+$ kubectl --user=<user@wescale.fr> get nodes
+```
 - Now we can see that the user is getting authenticated, now it needs authorization. For that, we need to create a cluster role that can do everything in all k8s ressources.
 
 ```sh
@@ -55,5 +69,8 @@ $ kubectl create -f clusterRolebinding.yml
 $ kubectl --user=<user@wescale.fr> get nodes
 ```
 
+Are you satisfied with this configuration?
+What could you improve?
 
-
+We can use a `group` claim present in the id_token.
+Then bind the roles to the group instead of the direct users.
