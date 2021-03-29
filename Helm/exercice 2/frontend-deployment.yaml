@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend-container
-          image: lmnzr/simplefrontend:latest
+          image: eu.gcr.io/sandbox-training-225413/simplefrontend:latest
           env:
             - name: BACKEND_URL
               value: "http://backend-svc:8080"

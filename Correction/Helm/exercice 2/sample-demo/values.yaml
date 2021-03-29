@@ -16,7 +16,7 @@ frontend:
   enabled: true
   replicaCount: 1
   image:
-    repository: lmnzr/simplefrontend
+    repository: eu.gcr.io/sandbox-training-225413/simplefrontend
     pullPolicy: Always
     ports:
       containerPort: 80
