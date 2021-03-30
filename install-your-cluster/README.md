@@ -22,7 +22,7 @@ ssh-add kubernetes-formation
 # Ensure the key is present
 ssh-add -L 
 # SSH
-ssh -F provided_ssh_config bastion
+ssh -A -F provided_ssh_config bastion
 cd creds
 # you should see a cluster.yml file
 ls -lath
