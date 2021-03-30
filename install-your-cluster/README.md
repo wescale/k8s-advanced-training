@@ -59,7 +59,7 @@ rke cert rotate
 
 ## IngressController
 
-Look at the resoucres deployed on the `ingress-nginx` namespace.
+Look at the resources deployed on the `ingress-nginx` namespace.
 
 Examine the DaemonSet to answer the following questions:
 * Where are the nginx pods running?
