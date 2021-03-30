@@ -17,7 +17,7 @@ RKE is already installed on the bastion.
 To connect on the bastion instance, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) start an ssh agent to add the key and connect to the instance:
 ```sh
 chmod 400 kubernetes-formation
-`eval "$(ssh-agent -s)"`
+eval "$(ssh-agent -s)"
 ssh-add kubernetes-formation
 # Ensure the key is present
 ssh-add -L 

@@ -12,11 +12,12 @@ echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
 # Update the package list and install the Cloud SDK
-apt-get update && sudo apt-get install -y google-cloud-sdk kubectl nano unzip git
-gcloud config set compute/zone europe-west1-b
+sudo apt-get update && sudo apt-get install -y google-cloud-sdk kubectl nano unzip git
 
-wget -O /usr/bin/rke https://github.com/rancher/rke/releases/download/v1.1.15/rke_darwin-amd64
-chmod +x /usr/bin/rke
+sudo wget -O /usr/bin/rke https://github.com/rancher/rke/releases/download/v1.1.15/rke_linux-amd64
+sudo chmod +x /usr/bin/rke
 
 snap install go --classic
 go get github.com/micahhausler/k8s-oidc-helper
+
+gcloud config set compute/zone europe-west1-b
