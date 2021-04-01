@@ -16,8 +16,3 @@ sudo apt-get update && sudo apt-get install -y google-cloud-sdk kubectl nano unz
 
 sudo wget -O /usr/bin/rke https://github.com/rancher/rke/releases/download/v1.1.15/rke_linux-amd64
 sudo chmod +x /usr/bin/rke
-
-snap install go --classic
-go get github.com/micahhausler/k8s-oidc-helper
-
-gcloud config set compute/zone europe-west1-b
