@@ -5,7 +5,7 @@ Istio hand-on
 
 ## Installing Istio
 ```sh
-curl -L https://istio.io/downloadIstio | sh -
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.8.0 TARGET_ARCH=x86_64 sh -
 cd istio-1.8.0
 export PATH=$PWD/bin:$PATH
 istioctl install --set profile=default -y
@@ -34,12 +34,20 @@ Deploy nginx (deployment and service):
 ```sh
 kubectl apply -f nginx.yaml -n mesh
 ```
+
 Deploy apache (deployment and service):
 ```sh
 kubectl apply -f apache.yaml -n mesh
 ```
 
-If we get the pods we will see that there are 2 containers, an envoy side car was injected
+If we inspect the pods we will see that there are 2 containers inside each pod, an envoy side car was injected (Istio Mutating admission controller)
+
+```sh
+kubectl describe pod nginx-xxxx -n mesh
+kubectl describe pod apache-xxxx -n mesh
+```
+
+
 
 Now we will expose our deployment through the ingress gateway:
 Create the http gateway
@@ -90,15 +98,15 @@ curl --header "Host: hello.wescale.fr" http://$INGRESS_HOST:$INGRESS_PORT/
 ## Observability
 Intall Prometheus
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.8/samples/addons/prometheus.yaml
+kubectl apply -f prometheus.yaml
 ```
 Install Kiali
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.8/samples/addons/kiali.yaml
+kubectl apply -f kiali.yaml
 ```
 Install Grafana
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.8/samples/addons/grafana.yaml
+kubectl apply -f grafana.yaml
 ```
 
 Deploy bookinfo app
@@ -116,31 +124,15 @@ Generate trafic
 watch -n 1 curl -o /dev/null -s -w %{http_code} http://$INGRESS_HOST:$INGRESS_PORT/productpage
 ```
 
-Open SSH tunnels from your local machine to the bastion to use your browser
-```sh
-ssh -L 20001:localhost:20001 -L 3000:localhost:3000  training@bastion.wsc-kubernetes-training-<index>.wescaletraining.fr -i kubernetes-formation
-```
 
-Observe with Kiali
+Visualise trafic graph with kiali (replace x with your trainee index)
 
-```sh
-istioctl dashboard kiali
-```
-
-Visualise trafic graph
-
-http://localhost:20001/kiali/console/graph/namespaces/?edges=responseTime&graphType=versionedApp&unusedNodes=false&operationNodes=false&injectServiceNodes=true&duration=60&refresh=10000&namespaces=mesh&layout=dagre
+http://lb.wsc-kubernetes-adv-training-x.wescaletraining.fr:30672/kiali/console/graph/namespaces/?edges=responseTime&graphType=versionedApp&unusedNodes=false&operationNodes=false&injectServiceNodes=true&duration=60&refresh=10000&namespaces=mesh&layout=dagre
 
 
-Observe with Grafana
+Multiple graphs are available on grafana explore them
 
-```sh
-istioctl dashboard grafana
-```
-
-Multiple graphs are available explore them
-
-http://localhost:3000/d/LJ_uJAvmk/istio-service-dashboard?orgId=1&refresh=1m&var-datasource=default&var-service=productpage.mesh.svc.cluster.local&var-srcns=All&var-srcwl=All&var-dstns=All&var-dstwl=All
+http://lb.wsc-kubernetes-adv-training-0.wescaletraining.fr:31717/d/LJ_uJAvmk/istio-service-dashboard?orgId=1&refresh=1m&var-datasource=default&var-service=productpage.mesh.svc.cluster.local&var-srcns=All&var-srcwl=All&var-dstns=All&var-dstwl=All
 
 
 
