@@ -49,8 +49,6 @@ spec:
 kubectl create -f default-resources-demo-pod.yaml --namespace default-resources-config
 ```
 
-The Pod should be a `best effort`.
-
 Check its QoS class and resource requests/limits:
 ```sh
 kubectl get pod default-resources-demo --output=yaml --namespace=default-resources-config
