@@ -14,5 +14,5 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 # Update the package list and install the Cloud SDK
 sudo apt-get update && sudo apt-get install -y google-cloud-sdk kubectl nano unzip git
 
-sudo wget -O /usr/bin/rke https://github.com/rancher/rke/releases/download/v1.1.15/rke_linux-amd64
+sudo wget -O /usr/bin/rke https://github.com/rancher/rke/releases/download/v1.3.8/rke_linux-amd64
 sudo chmod +x /usr/bin/rke
