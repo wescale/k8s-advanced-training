@@ -10,14 +10,14 @@ For example, some applications might need to know:
 
 # Create a namespace and inspect default serviceaccount
 
-- Create the namespace wsc-kubernetes-training-sa
-- Each namespace has a default ServiceAccount, named default. Can you verify this for your namespace ?
+- Create the namespace `wsc-kubernetes-training-sa`
+- Each namespace has a default ServiceAccount, named `default`. Can you verify this for your namespace ?
 
 ```sh
 kubectl get sa --all-namespaces | grep default
  ```
 
-- Let’s inspect the ServiceAccount named default for your namespace
+- Let’s inspect the ServiceAccount named `default` for your namespace
 
 ```sh
 kubectl get sa default -n wsc-kubernetes-training-sa -o yaml
@@ -75,7 +75,7 @@ kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
 - Verify that the same default sa is used 
 
 The serviceAccountName key is set with the name of the default ServiceAccount.
-The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of volume, in /var/run/secrets/kubernetes.io/serviceaccount
+The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of volume, in `/var/run/secrets/kubernetes.io/serviceaccount`
 
 - Try from the container to get information from the API server (endpoint: `https://kubernetes.default.svc/api/v1`) without authentication.
   What do you notice ?
@@ -83,8 +83,8 @@ The information of the ServiceAccount is mounted inside the container of the Pod
 - Try from the container to do the same call using the ServiceAccount token
 
 - Try to you use this token to list all the Pods 
-  - inside the default namespace: https://kubernetes.default.svc/api/v1/default/pods
-  - inside the current namespace: https://kubernetes.default.svc/api/v1/wsc-kubernetes-training-sa/pods
+  - inside the default namespace: https://kubernetes.default.svc/api/v1/namespaces/default/pods
+  - inside the current namespace: https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods
 
 What do you notice ?
 
@@ -100,7 +100,7 @@ What kind of Role do you need ? Role ou ClusterRole ?
 
 - Try to bind the Role and the ServiceAccount created above
 
- - Create a new pod in your namespace using the ServiceAccount within a Pod 
+- Create a new pod in your namespace using the ServiceAccount within a Pod 
 
 ```sh
 apiVersion: v1
@@ -117,7 +117,7 @@ spec:
     - "10000"
  ```
 
- - Within your namespace, inside the new Pod, try to you use the token for your new sa to list all the Pods:  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods and 
+- Within your namespace, inside the new Pod, try to you use the token for your new sa to list all the Pods:  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods and 
  https://kubernetes.default.svc/api/v1/namespaces/default/pods
  
 What do you notice when you call the api namespaces/default/pods ?
