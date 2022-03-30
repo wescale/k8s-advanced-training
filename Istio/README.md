@@ -28,6 +28,7 @@ kubectl create ns mesh
 kubectl label namespace mesh istio-injection=enabled
 ```
 
+
 First we deploy the 2 apps (nginx & apache)
 
 Deploy nginx (deployment and service):
@@ -63,12 +64,13 @@ Note that the virtual service is routing based on path and setting a header on r
 To access the service we need to get the ingress-gateway NodeIP and port
 ```sh
 export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
-export INGRESS_HOST=$(kubectl get nodes worker-0 -o jsonpath='{ .status.addresses[?(@.type=="InternalIP")].address }')
+# Replace X with your environment
+export INGRESS_HOST=lb.wsc-kubernetes-adv-training-X.wescaletraining.fr
 ```
 Accessing services
 ```sh
 curl http://$INGRESS_HOST:$INGRESS_PORT/nginx -v
-curl  http://$INGRESS_HOST:$INGRESS_PORT/apache -v
+curl http://$INGRESS_HOST:$INGRESS_PORT/apache -v
 ```
 
 ## Fault injection
@@ -96,20 +98,15 @@ curl --header "Host: hello.wescale.fr" http://$INGRESS_HOST:$INGRESS_PORT/
 90% of trafic is going to version 1 and the remaining 10% is going to version 2
 
 ## Observability
-Intall Prometheus
+
+Intall Prometheus, Kiali and Grafana:
 ```sh
 kubectl apply -f prometheus.yaml
-```
-Install Kiali
-```sh
 kubectl apply -f kiali.yaml
-```
-Install Grafana
-```sh
 kubectl apply -f grafana.yaml
 ```
 
-Deploy bookinfo app
+Deploy [bookinfo app](https://istio.io/latest/docs/examples/bookinfo/) 
 ```sh
 kubectl apply -f bookinfo.yaml -n mesh
 ```
@@ -132,7 +129,7 @@ http://lb.wsc-kubernetes-adv-training-x.wescaletraining.fr:30672/kiali/console/g
 
 Multiple graphs are available on grafana explore them
 
-http://lb.wsc-kubernetes-adv-training-0.wescaletraining.fr:31717/d/LJ_uJAvmk/istio-service-dashboard?orgId=1&refresh=1m&var-datasource=default&var-service=productpage.mesh.svc.cluster.local&var-srcns=All&var-srcwl=All&var-dstns=All&var-dstwl=All
+http://lb.wsc-kubernetes-adv-training-x.wescaletraining.fr:31717/d/LJ_uJAvmk/istio-service-dashboard?orgId=1&refresh=1m&var-datasource=default&var-service=productpage.mesh.svc.cluster.local&var-srcns=All&var-srcwl=All&var-dstns=All&var-dstwl=All
 
 
 
