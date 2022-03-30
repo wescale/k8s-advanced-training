@@ -28,7 +28,7 @@ cd creds
 ls -lath
 ```
 
-Once connected, to the bastion instance, use the provided cluster.yml file.
+Once connected to the bastion instance, use the provided cluster.yml file.
 Look at this file. In particular the `nodes` section.
 
 Now, you can build your cluster:
@@ -39,7 +39,7 @@ rke up
 This takes about 5 minutes.
 At the end, a kubeconfig has been generated.
 
-Copy-it to the default location for kubectl:
+Copy it to the default location for kubectl:
 ```sh
 mkdir -p ~/.kube
 cp kube_config_cluster.yml ~/.kube/config
@@ -66,11 +66,7 @@ Examine the DaemonSet to answer the following questions:
 * How is that achieved?
 * What are the ports they exposed?
 
-Ask your trainer to indicate the public DNS record for the workers!
-
-Try to connect to the exposed Nginx.
-
-For that, you have a DNS record has been given to join the worker nodes.
+Ask your trainer to indicate the public DNS record for the workers and try to connect to the exposed Nginx.
 
 ## StorageClass and provisioner
 
@@ -180,7 +176,7 @@ What do you suggest to correct that?
 
 Connect to a master node to view the `cidrs`of the cluster:
 ```sh
-ssh -F provided_ssh_config master-0-training-X
+ssh -F provided_ssh_config master-0
 sudo su
 ps -ef|grep kube-controller
 ```
