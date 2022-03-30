@@ -1,7 +1,7 @@
 # Hands-on: Operators
 
 During this exercice we will install a mysql operator to create mysql cluster and manage backups to minio S3 bucket
-https://github.com/presslabs/mysql-operator
+https://github.com/bitpoke/mysql-operator
 
 ## Installing Mysql Operator
 
@@ -57,21 +57,21 @@ kubectl describe mysql my-db
 
 We can see that the operator created a mysql cluster with 2 replicas one master and one replica + persistent volumes
 
-``sh
+```sh
 kubectl get pods -l role=master
 kubectl get pods -l role=replica
 kubectl get pvc
 ```
 Test the connection to the database
 
-``sh
+```sh
 kubectl run mysql-client --image=mysql:5.7 -it --rm --restart=Never -- /bin/bash
 #then in the container prompt
 mysql -h my-db-mysql -uroot -pdbsecret -e 'SELECT 1'
 ```
 
 If we delete the master pod we can see that the operator promoted the replica pod to master
-``sh
+```sh
 kubectl delete pod -l role=master
 kubectl get pods -l role=master
 kubectl get pods -l role=replica
@@ -105,9 +105,10 @@ export POD_NAME=$(kubectl get pods --namespace default -l "release=minio" -o jso
 kubectl port-forward $POD_NAME 9000
 ```
 
-Open a tunnel in your local machine 
+Open a tunnel in your local machine
 ```sh
-ssh -L 9000:localhost:9000 training@bastion.wsc-kubernetes-training-2.wescaletraining.fr -i kubernetes-formation
+# Replace X with your environment number
+ssh -L 9000:localhost:9000 training@bastion.wsc-kubernetes-training-X.wescaletraining.fr -i kubernetes-formation
 ```
 
 URL: http://localhost:9000/minio/mysql/
