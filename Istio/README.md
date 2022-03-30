@@ -99,11 +99,12 @@ curl --header "Host: hello.wescale.fr" http://$INGRESS_HOST:$INGRESS_PORT/
 
 ## Observability
 
-Intall Prometheus, Kiali and Grafana:
+For a full observability stack, intall: Prometheus, Kiali, Grafana and Jaeger
 ```sh
 kubectl apply -f prometheus.yaml
 kubectl apply -f kiali.yaml
 kubectl apply -f grafana.yaml
+kubectk apply -f  https://raw.githubusercontent.com/istio/istio/release-1.8/samples/addons/jaeger.yaml
 ```
 
 Deploy [bookinfo app](https://istio.io/latest/docs/examples/bookinfo/) 
