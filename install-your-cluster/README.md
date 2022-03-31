@@ -83,7 +83,7 @@ kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storagec
 
 Inspect the config maps of the related namespace, to determine where this StorageClass will create the persistent volumes.
 
-You can connect to the kubernetes nodes `ssh -F provided_ssh_config worker-0-training-X` to see their file system and mount points.
+You can connect to the kubernetes nodes `ssh -F provided_ssh_config worker-0` to see their file system and mount points.
 
 Questions:
 * What happens if the node is lost?

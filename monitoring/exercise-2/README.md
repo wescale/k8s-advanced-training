@@ -1,14 +1,73 @@
 # Monitoring with prometheus
 
-In this exercise, you will deploy a wordpress application.
 
-Once done, you will add prometheus exporters and prometheus-operator CRDs to add monitoring.
+In this exercise, you will deploy a wordpress application then monitor it with Prometheus and Grafana.
+
+You will add prometheus exporters and prometheus-operator CRDs to add monitoring.
 
 Then you will create a dashboard on Grafana to verify your PromQL query that you will reuse to create a Prometheus rule.
 
 Finally, you will delete pods and ensure you see the alarm triggered.
+## Setup
 
-## Deploy the wordpress
+**If not already done**, install the [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus) which is a ready to use complete monitoring stack: Prometheus, Grafana and Alert Manager.
+
+```sh
+git clone https://github.com/prometheus-operator/kube-prometheus
+cd kube-prometheus
+git checkout release-0.7
+kubectl create -f manifests/setup
+until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+kubectl create -f manifests/
+````
+
+Take a look a the manifests. 
+
+In particular the CustomResourceDefinition in the folder `manifests/setup`:
+* ServiceMonitor
+* PodMonitor
+* Prometheus
+
+Prometheus, Grafana and Alert Manager are exposed as ClusterIP: they are only internal to the cluster.
+
+If you want to reach them, you can use port forward, or create additional k8s NodePort services (recommended).
+
+### Access the service using port-forward (not recommended)
+
+Use `ssh -L` option to forward ports 9090, 3000 and 9093 from the bastion.
+
+Then on the bastion,  use the `port-forward` kubectl command:
+```sh
+kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090 &
+kubectl --namespace monitoring port-forward svc/grafana 3000 &
+kubectl --namespace monitoring port-forward svc/alertmanager-main 9093 &
+```
+
+And open the following URLs:
+* Prometheus [http://localhost:9090](http://localhost:9090)
+  * See its configuration, targets and some metrics
+* Grafana [http://localhost:3000](http://localhost:3000)
+  * admin/admin.
+* AlertManager [http://localhost:9093](http://localhost:9093)
+
+### Access the services using additional k8s Node Port services (preferred way)
+
+Create new NodePort Services:
+```sh
+kubectl apply -f monitoring-services.yaml -n monitoring
+```
+
+Open you browser (replace `X` with your env number):
+* Prometheus: http://lb.wsc-kubernetes-adv-training-X.wescaletraining.fr:32601
+* Alert Manager http://lb.wsc-kubernetes-adv-training-X.wescaletraining.fr:32602
+* Grafana: http://lb.wsc-kubernetes-adv-training-X.wescaletraining.fr:32603
+
+### Add dashboards on Grafana
+
+Add the [Kubernetes Cluster (Prometheus)](https://grafana.com/grafana/dashboards/6417) dashboard.
+
+
+## Deploy the application
 
 ### Create the MySQL Password Secret
 
@@ -24,7 +83,7 @@ This secret is referenced by the MySQL and WordPress pod configuration so that t
 
 Now that the secrets is defined, the Kubernetes pods can be launched. Start MySQL using [mysql-deployment.yaml](mysql-deployment.yaml).
 
-Take a look at [mysql-deployment.yaml](mysql-deployment.yaml), and note that we've defined a volume mount for `/var/lib/mysql`, and then created a Persistent Volume Claim that looks for a 20G volume. 
+Take a look at [mysql-deployment.yaml](mysql-deployment.yaml), and note that we've defined a volume mount for `/var/lib/mysql`, and then created a Persistent Volume Claim that looks for a 2G volume. 
 This claim is satisfied by any volume that meets the requirements.
 
 Also look at the `env` section and see that we specified the password by referencing the secret `mysql-pass` that we created above. Secrets can have multiple key:value pairs. Ours has only one key `password.txt` which was the name of the file we used to create the secret. The [MySQL image](https://hub.docker.com/_/mysql/) sets the database password using the `MYSQL_ROOT_PASSWORD` environment variable.
@@ -102,41 +161,34 @@ database hostname through the environment variable
 `WORDPRESS_DB_HOST`. We set the env value to the name of the MySQL
 service we created: `wordpress-mysql`.
 
+
+### Visit your new WordPress blog
+
+
+Now, we can visit the running WordPress app.
+
+Retrieve the opened Node port:
 ```shell
 kubectl get services wordpress
 ```
 
 ```shell
-NAME        CLUSTER-IP     EXTERNAL-IP     PORT(S)   AGE
-wordpress   10.0.0.5       1.2.3.4         80/TCP    19h
+NAME        TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+wordpress   NodePort   10.43.21.217   <none>        80:31362/TCP   5m15s
 ```
 
-### Visit your new WordPress blog
-
-Now, we can visit the running WordPress app. Use the external IP of
-the service that you obtained above.
 
 ```shell
-http://<external-ip>
+http://<external-ip>:Node_Port
 ```
 
 You should see the familiar WordPress init page.
 
-![WordPress init page](WordPress.png "WordPress init page")
-
-> Warning: Do not leave your WordPress installation on this page. If
-> it is found by another user, they can set up a website on your
-> instance and use it to serve potentially malicious content. You
-> should either continue with the installation past the point at which
-> you create your username and password, delete your instance, or set
-> up a firewall to restrict access.
-
-
 ## Add prometheus exporters
 
 You will complete your stack to:
-* add a [mysqld_exporter](https://github.com/prometheus/mysqld_exporter/blob/master/README.md) sidecar to the mysql container. With this sidecar the mysql pods can be monitored so you will define a PodMonitor for that.
-* deploy a blackboxexporter XXXX
+* add a [mysqld_exporter](https://github.com/prometheus/mysqld_exporter/blob/master/README.md) sidecar to the mysql container. With this sidecar the mysql pods can expose metrics and Prometheus will collect them.
+* deploy a [backboxexporter](https://github.com/prometheus/blackbox_exporter) to call your wordpress application and ensure it is running
 
 ### Monitor the mysql pods
 
@@ -151,7 +203,7 @@ Wait 1 minute and ensure you see this target in the Prometheus /targets
 
 ### Create a Grafana dashboard to monitor the mysql service
 
-Download this Grafana [dashboard](https://github.com/prometheus/mysqld_exporter/blob/master/mysqld-mixin/dashboards/mysql-overview.json) `mysql-overview` for the mysqld_exporter and import it into Grafana.
+Download this Grafana [dashboard](https://raw.githubusercontent.com/prometheus/mysqld_exporter/main/mysqld-mixin/dashboards/mysql-overview.json) `mysql-overview` for the mysqld_exporter and import it into Grafana.
 
 Ensure it works well.
 
@@ -160,8 +212,6 @@ Ensure it works well.
 Create a [PrometheusRule](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheusrule), to ensure you have at least one mysql_exporter up.
 
 N.B: inspect the `ruleSelector` of the Prometheus to be sure your rule will be taken into account.
-
-You can use grafana to test your PromQL request.
 
 ### Bonus: Deploy the black box exporter and add an HTTP Probe to monitor the wordpress
 
@@ -173,5 +223,3 @@ This exporter will need a configuration file: you can use the [default one](http
 
 Then, create a CRD [Probe](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#probe) to monitor an URL of the Wordpress
 
-
-### Create dashboard
