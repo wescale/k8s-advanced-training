@@ -104,7 +104,7 @@ For a full observability stack, intall: Prometheus, Kiali, Grafana and Jaeger
 kubectl apply -f prometheus.yaml
 kubectl apply -f kiali.yaml
 kubectl apply -f grafana.yaml
-kubectk apply -f  https://raw.githubusercontent.com/istio/istio/release-1.8/samples/addons/jaeger.yaml
+kubectl apply -f  https://raw.githubusercontent.com/istio/istio/release-1.8/samples/addons/jaeger.yaml
 ```
 
 Deploy [bookinfo app](https://istio.io/latest/docs/examples/bookinfo/) 
