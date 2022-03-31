@@ -1,4 +1,4 @@
-In this exercise, you will instanciate an ArgoCD and get familiar with basics of GitOps.
+In this exercise, you will instantiate an ArgoCD and get familiar with basics of GitOps.
 
 
 ## Install ArgoCD
@@ -38,7 +38,7 @@ You should see your application.
 
 # Declarative manifests
 
-Look at the resources your kubernets cluster can manage (`kubectl api-resources`).
+Look at the resources your kubernetes cluster can manage (`kubectl api-resources`).
 What are the resources provided by **argo**?
 
 Edit the `application.yaml` to declare an ArgoCD application named `declarative-gitops-chart` to deploy the same Helm chart as above.

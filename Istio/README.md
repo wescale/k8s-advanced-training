@@ -20,7 +20,7 @@ istiod-66bb7cb55c-59cvh                 1/1     Running   0          75s
 ```
 
 ## HTTP routing with istio
-We will deploy ngninx and apache in the cluster and use Istio traffic management to reach those services
+We will deploy nginx and apache in the cluster and use Istio traffic management to reach those services
 
 First we will create a namespace called "mesh" and add the appropriate label to enable envoy sidecar injection
 ```sh
@@ -91,11 +91,11 @@ Then we create a VirtualService and DestinationRule to achieve canary deployment
 ```sh
 kubectl apply -f web-dr-vs-canary.yaml -n mesh
 ```
-The virtual service routes trafic based on host header, to test the canary release execute several times:
+The virtual service routes traffic based on host header, to test the canary release execute several times:
 ```sh
 curl --header "Host: hello.wescale.fr" http://$INGRESS_HOST:$INGRESS_PORT/
 ```
-90% of trafic is going to version 1 and the remaining 10% is going to version 2
+90% of traffic is going to version 1 and the remaining 10% is going to version 2
 
 ## Observability
 
@@ -117,13 +117,13 @@ Deploy bookinfo VirtualService
 kubectl apply -f bookinfo-vs.yaml -n mesh
 ```
 
-Generate trafic 
+Generate traffic 
 ```sh
 watch -n 1 curl -o /dev/null -s -w %{http_code} http://$INGRESS_HOST:$INGRESS_PORT/productpage
 ```
 
 
-Visualise trafic graph with kiali (replace x with your trainee index)
+Visualize traffic graph with kiali (replace x with your trainee index)
 
 http://lb.wsc-kubernetes-adv-training-x.wescaletraining.fr:30672/kiali/console/graph/namespaces/?edges=responseTime&graphType=versionedApp&unusedNodes=false&operationNodes=false&injectServiceNodes=true&duration=60&refresh=10000&namespaces=mesh&layout=dagre
 

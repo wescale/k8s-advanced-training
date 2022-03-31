@@ -1,6 +1,6 @@
 # Hands-on: Operators
 
-During this exercice we will install a mysql operator to create mysql cluster and manage backups to minio S3 bucket
+During this exercise we will install a mysql operator to create mysql cluster and manage backups to minio S3 bucket
 https://github.com/bitpoke/mysql-operator
 
 ## Installing Mysql Operator
@@ -21,7 +21,7 @@ NAME               READY   STATUS    RESTARTS   AGE
 mysql-operator-0   2/2     Running   0          41s
 ```
 
-The operator extended K8S api server with 2 new api ressources
+The operator extended K8S api server with 2 new api resources
 
 ```sh
 kubectl get crd | grep "presslabs"
@@ -37,7 +37,7 @@ First we will create a secret containing the root password
 kubectl apply -f root-secret.yaml
 ```
 
-Then we will deploy the ressource MysqlCluster to create the database cluster
+Then we will deploy the resource MysqlCluster to create the database cluster
 
 ```sh
 kubectl apply -f cluster.yaml

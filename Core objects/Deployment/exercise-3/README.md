@@ -8,7 +8,7 @@ You will see the interests of using deployment:
 
 ## Deploy version 1.0 with 2 replicas
 
-Create a deployment file with the following content (be carefull, the provided `.yaml` file may be incorrect! See [the documentation if needed](https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#deploymentspec-v1-apps)):
+Create a deployment file with the following content (be careful, the provided `.yaml` file may be incorrect! See [the documentation if needed](https://v1-18.docs.kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#deploymentspec-v1-apps)):
 ```
 apiVersion: apps/v1
 kind: Deployment

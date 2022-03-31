@@ -49,7 +49,7 @@ kubectl cluster-info
 
 ## Rotate the certificates
 
-Kubernetes involves a lot of certificates, which must be rotated in the case of a comprimised cert or just because they will soon expire.
+Kubernetes involves a lot of certificates, which must be rotated in the case of a compromised cert or just because they will soon expire.
 
 RKE provides useful commands to rotate certificates.
 
@@ -188,7 +188,7 @@ ps -ef|grep kube-controller
 
 Inspect the `cluster.yaml` file to determine the network plugin used by the cluster.
 
-Generally, netwok plugin are configured using Custom Resource Definition - CRDs. Those CRDs are additional Kubernetes objects. 
+Generally, network plugin are configured using Custom Resource Definition - CRDs. Those CRDs are additional Kubernetes objects. 
 To list the available resources on a cluster: `kubectl api-resources`
 ### Overlay network. 
 
@@ -196,5 +196,5 @@ As seen, Calico is able to integrate or not overlays (IpInIP or VxLAN).
 
 In the `kube-system` namespace, look at the `ippools` and `configmap/calico-config` objects. 
 
-* Is there an ovelay network?
+* Is there an overlay network?
 * Is BGP (BIRD) used?

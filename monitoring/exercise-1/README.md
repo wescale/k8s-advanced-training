@@ -101,7 +101,7 @@ Create the deployment and service:
 kubectl create -f deployment.yaml
 ```
 
-Create the ServiceMonitor which targets the created abovce service:
+Create the ServiceMonitor which targets the created above service:
 ```
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor

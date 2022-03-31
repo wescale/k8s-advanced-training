@@ -16,4 +16,4 @@ Invalid image
 
 ### Plus service qui a un mauvais selector
 
-## plus de capacités -> eviction ou scheduled never ou limitRange
+## plus de capacités -> eviction or scheduled never or limitRange

@@ -1,6 +1,6 @@
 # exercise-1: A secret and a configmap for a database.
 
-In this exercise, you will create a k8s secret as well as a k8s configmap to correctly configure a MariaDB databse.
+In this exercise, you will create a k8s secret as well as a k8s configmap to correctly configure a MariaDB database.
 
 # Secrets
 

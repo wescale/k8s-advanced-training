@@ -1,7 +1,7 @@
 # exercise-7: Limits per container and inside a namespace
 
-In this exercise, you will see how to control the maximum resource used in a namspace:
-* LimitRange to defing limits per container
+In this exercise, you will see how to control the maximum resource used in a namespace:
+* LimitRange to defining limits per container
 * ResourceQuota to define limits inside the whole namespace
 
 ## Start by creating a namespace
@@ -43,12 +43,12 @@ kubectl get pod resource-constraints-pod --namespace resource-constraints-demo -
 
 Are the values matching the ones we expected?
 
-## Create pod outside the boudaries of the LimitRange
+## Create pod outside the boundaries of the LimitRange
 ```sh
 kubectl create -f resource-constraints-pod-2.yaml --namespace resource-constraints-demo
 ```
 
-## Creata a new namespace 
+## Create a new namespace 
 
 ```sh
 kubectl create namespace resource-quota-demo
