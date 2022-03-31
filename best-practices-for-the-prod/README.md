@@ -19,18 +19,21 @@ This is very bad habit.
 
 ## Install OPA
 
-You will install OpenPolicyAgent and link it with the k8s AdmissionController.
+You will install OpenPolicyAgent with Gatekeeper.
 
-The doc is [here](https://www.openpolicyagent.org/docs/latest/kubernetes-tutorial/)
 
-Once you have tested the policy to ensure no Ingress overwrites
-
+The doc is [here](https://open-policy-agent.github.io/gatekeeper/website/docs/install/)
 
 ## Create your first policy
 
 Write your own policy to ensure a pod does not have the `latest` tag.
-
 You can consult this [page](https://www.magalix.com/blog/enforce-that-all-kubernetes-container-images-must-have-a-label-that-is-not-latest-using-opa)
+
+
+Then, push the policy via a Gatekeeper CRD.
+
+An example is [here](https://github.com/open-policy-agent/gatekeeper/blob/master/example/templates/k8srequiredlabels_template.yaml)
+
 
 Is your policy working?
 
