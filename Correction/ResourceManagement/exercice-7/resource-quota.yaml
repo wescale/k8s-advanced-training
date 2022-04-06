@@ -1,0 +1,11 @@
+iapiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: resource-quota
+  namespace: resource-quota-demo
+spec:
+  hard:
+    requests.cpu: "1.4"
+    requests.memory: 2Gi
+    limits.cpu: "2"
+    limits.memory: 3Gi

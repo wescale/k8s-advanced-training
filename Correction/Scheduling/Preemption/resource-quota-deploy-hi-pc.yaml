@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deploy-pc
+spec:
+  selector:
+    matchLabels:
+      app: test-deploy-pc
+  template:
+    metadata:
+      labels:
+        app: test-deploy-pc
+    spec:
+      priorityClassName: test-pc
+      containers:
+      - name: default-resources-cont
+        image: httpd:2.4
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: 0.1
+          requests:
+            memory: "64Mi"
+            cpu: 0.1

@@ -6,78 +6,109 @@ Then, you will create 3 pods, each with or without requests and limits.
 
 ## Create a namespace
 
-```sh
-kubectl create namespace default-resources-config
-```
+Create a namespace named `default-resources-config`.
 
 ## Create a LimitRange to specifiy default limits and requests
 
+Inside this namespace, create a `LimitRange` named `default-requests-and-limits` which sets the followings default values:
+* **Memory limit** must 64Mi
+* **CPU limit** must be 0.2 core
+* **Memory request** must 32Mi
+* **CPU request** must be 0.1 core
+
+For details about the LimitRange specification, use `kubectl explain` command or see the online documentation for your current Kubernetes version.
+
 ```
-apiVersion: v1
+apiVersion: apps/v1
 kind: LimitRange
 metadata:
   name: default-requests-and-limits
 spec:
   limits:
   - default:
-      memory: 512Mi
-      cpu: 0.8
-    defaultRequest:
-      memory: 256Mi
-      cpu: 0.4
-    type: Container
+  ...
 ```
+## Create a Deployment without resource specifications
 
-```sh
-kubectl create -f limit-range-1.yaml --namespace=default-resources-config
+Here is the file to use:
 ```
-
-## Create a Pod without resource specifications
-
-```
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: default-resources-demo
+  name: no-res-spec
+  namespace: default-resources-config
 spec:
-  containers:
-  - name: default-resources-cont
-    image: httpd:2.4
+  selector:
+    matchLabels:
+      app: no-res-spec
+  template:
+    metadata:
+      labels:
+        app: no-res-spec
+    spec:
+      containers:
+      - name: apache
+        image: httpd:2.4
 ```
 
-```sh
-kubectl create -f default-resources-demo-pod.yaml --namespace default-resources-config
-```
-
-Check its QoS class and resource requests/limits:
-```sh
-kubectl get pod default-resources-demo --output=yaml --namespace=default-resources-config
-```
+View the `QoS` class of the created pods and the resource requests/limits.
 
 Are the values the ones we expected?
 
-## Create a Pod with only limits
+## Create a Deployment with only limits
 
 ```sh
-kubectl create -f default-resources-demo-pod-2.yaml --namespace default-resources-config
-```
-
-```sh
-kubectl get pod default-resources-demo-2 --output=yaml --namespace default-resources-config
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: limit-only-spec
+  namespace: default-resources-config
+spec:
+  selector:
+    matchLabels:
+      app: limit-only-spec
+  template:
+    metadata:
+      labels:
+        app: limit-only-spec
+    spec:
+      containers:
+      - name: default-resources-cont
+        image: httpd:2.4
+        resources:
+          limits:
+            memory: "0.2Gi"
+            cpu: 0.2
 ```
 
 What do you see as QoS class?
 
 Why?
 
-## Create a Pod with only requests
+## Create a Deployment with only requests
 
 ```
-kubectl create -f default-resources-demo-pod-3.yaml --namespace default-resources-config
-```
-
-```
-kubectl get pod default-resources-demo-3 --output=yaml --namespace default-resources-config
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: req-only-spec
+  namespace: default-resources-config
+spec:
+  selector:
+    matchLabels:
+      app: req-only-spec
+  template:
+    metadata:
+      labels:
+        app: req-only-spec
+    spec:
+      containers:
+      - name: default-resources-cont
+        image: httpd:2.4
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: 0.2
 ```
 
 What do you see as QoS class?
@@ -88,7 +119,6 @@ Why?
 ```
 kubectl delete namespace default-resources-config
 ```
+## Your opinion
 
-
-
- 
+What values should you use for default limits and request?

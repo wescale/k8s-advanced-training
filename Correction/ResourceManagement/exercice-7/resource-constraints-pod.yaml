@@ -8,8 +8,8 @@ spec:
     image: httpd:2.4
     resources:
       limits:
-        memory: "900Mi"
-        cpu: 0.7
+        memory: "96Mi"
+        cpu: 0.3
       requests:
-        memory: "600Mi"
-        cpu: 0.4
+        memory: "64Mi"
+        cpu: 0.2

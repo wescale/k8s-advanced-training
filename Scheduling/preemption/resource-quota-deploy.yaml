@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-deploy
+spec:
+  selector:
+    matchLabels:
+      app: test-deploy
+  template:
+    metadata:
+      labels:
+        app: test-deploy
+    spec:
+      containers:
+      - name: default-resources-cont
+        image: httpd:2.4
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: 0.1
+          requests:
+            memory: "64Mi"
+            cpu: 0.1

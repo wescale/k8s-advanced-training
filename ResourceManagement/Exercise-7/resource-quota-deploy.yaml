@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy
+  namespace: resource-quota-demo
+spec:
+  selector:
+    matchLabels:
+      app: deploy
+  template:
+    metadata:
+      labels:
+        app: deploy
+    spec:
+      containers:
+      - name: default-resources-cont
+        image: httpd:2.4
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: 1.2
+          requests:
+            memory: "1.3Gi"
+            cpu: 0.8
