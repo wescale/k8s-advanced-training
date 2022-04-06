@@ -172,6 +172,7 @@ Can you find it?
 
 What do you suggest to correct that?
 
+Add a label `topology.kubernetes.io/zone` onto each worker node. Each with a value `a`, `b` or `c`.
 ## Capacity of the cluster
 
 Connect to a master node to view the `cidrs`of the cluster:
