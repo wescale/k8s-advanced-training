@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: httpd
+  namespace: scheduling
 spec:
   selector:
     matchLabels:
@@ -21,7 +22,7 @@ spec:
                 operator: In
                 values:
                 - apache
-            topologyKey: "kubernetes.io/hostname"
+            topologyKey: "topology.kubernetes.io/zone"
       containers:
       - name: httpd
         image: httpd

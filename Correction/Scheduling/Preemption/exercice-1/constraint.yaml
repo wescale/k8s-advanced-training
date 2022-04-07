@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-topology
+  namespace: scheduling
+spec:
+  selector:
+    matchLabels:
+      app: pause
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: pause
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: pause
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - pause
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: pod-topology
+        image: k8s.gcr.io/pause:3.1
