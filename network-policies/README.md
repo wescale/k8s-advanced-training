@@ -29,15 +29,15 @@ You should get HTTP 503 errors in your web browser.
 
 # Step 3 - Allow traffic to the web-application
 
-Create a network policy to allow ingress traffic from the `nginx` pods in the namespace `dmz` to wordpress pods in the `application` namespace.
+Create a network policy to allow ingress traffic from the `nginx` pods in the namespace `ingress-nginx` to wordpress pods in the `application` namespace.
+
+NOTE: you may need to delete the `wordpress` pod if it has been restarted too many times by the kubelet (CrashLoopBackOff).
 
 What are the ports to be allowed?
 
 # Step 4 - Allow traffic to the database
 
 Create a network policy to allow ingress traffic to TCP:? from the wordpress pods in the namespace `application` to mariadb pods in the `application` namespace.
-
-NOTE: you may need to delete the `wordpress` pod if it has been restarted too many times by the kubelet (CrashLoopBackOff).
 
 # Step 5 - Clean network policies
 

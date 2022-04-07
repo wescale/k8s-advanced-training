@@ -80,7 +80,8 @@ spec:
   - from:
     - namespaceSelector:
         matchLabels:
-          name: ingress-nginx
+          app.kubernetes.io/instance: ingress-nginx
+          app.kubernetes.io/name: ingress-nginx
       podSelector:
         matchLabels:
           app.kubernetes.io/component: controller

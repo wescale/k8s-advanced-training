@@ -7,7 +7,7 @@ First, start by creating a namespace `scheduling`.
 
 Deploy 2 pods with node affinity one hard and one is soft
 ```sh
-kubectl apply -f nodeaffinity.yaml
+kubectl apply -f nodeaffinity.yaml -n scheduling
 ```
 
 Check the status and location of the pods
@@ -96,7 +96,7 @@ We use pod anti affinity to avoid getting the replicas inside the same failure d
 
 Ensure you get a label named `zone` on your nodes.
 ```sh
-kubectl nodes --show-labels
+kubectl get nodes --show-labels
 ```
 
 Then complete the pod definition to avoid getting all the replicas on the same zone:
