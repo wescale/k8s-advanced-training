@@ -1,6 +1,6 @@
 # Preemption with PriorityClasses
 
-In this exercise, you will see how PriorityClasses control eviction of pods to ensure critical components are always running.
+In this exercise, you will see how PriorityClasses control the eviction of pods to ensure critical components are always running.
 
 ## Start by creating a namespace
 
@@ -65,7 +65,7 @@ Hint: remember to change the selector in your new deployment to avoid conflict w
 ```
 
 Create the deployment on kubernetes. Is your pod running?
-Now scale your new deployment to 10 pods. Are they running?
+Now scale your new deployment to 50 pods. Are they running?
 
 ## Clean
 

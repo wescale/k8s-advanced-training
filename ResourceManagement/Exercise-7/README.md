@@ -57,6 +57,7 @@ spec:
 
 
 ## Create pod outside the boundaries of the LimitRange
+A YAML exists for that:
 ```sh
 kubectl create -f resource-constraints-pod-2.yaml --namespace resource-constraints-demo
 ```

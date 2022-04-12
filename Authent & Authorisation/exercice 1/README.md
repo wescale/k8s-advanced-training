@@ -54,19 +54,19 @@ How to use this default token from within a simple Pod:
 - Create a new Pod in your namespace 
 
 ```sh
-    apiVersion: v1
-    kind: Pod
-    metadata:
-    name: pod-default
-    namespace: wsc-kubernetes-training-sa
-    spec:
-    containers:
-    - name: alpine
-      image: alpine:3.9
-      command:
-        - "sleep"
-        - "10000"
-  ```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-default
+  namespace: wsc-kubernetes-training-sa
+spec:
+  containers:
+  - name: alpine
+    image: alpine:3.9
+    command:
+      - "sleep"
+      - "10000"
+```
 
 ```sh
 kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml

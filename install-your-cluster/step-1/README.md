@@ -28,7 +28,7 @@ cd creds
 ls -lath
 ```
 
-Once connected to the bastion instance, use the provided cluster.yml file.
+Once connected to the bastion instance, use the provided `cluster.yml` file.
 Look at this file. In particular the `nodes` section.
 
 Now, you can build your cluster:
@@ -51,11 +51,10 @@ kubectl cluster-info
 
 Each node (control plane or data plane) is deployed in a given zone of the Google Cloud Platform.
 
-This information of 'domain of failure' can be used later to manage affinity and anti-affinity.
+This information of 'domain of failure' will be used later to manage affinity and anti-affinity.
 
 With kubectl, describe the nodes and look for this information.
-Can you find it?
 
-What do you suggest to correct that?
-
-Add a label `topology.kubernetes.io/zone` onto each worker node. Each with a value `a`, `b` or `c`.
+* Can you find it?
+* What do you suggest to correct that?
+* Add a label `topology.kubernetes.io/zone` onto each worker node. Each with a value `a`, `b` or `c`.

@@ -17,8 +17,7 @@ You will create a new StorageClass with (Rancher Local path provisioner)[https:/
 
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-
-# Then mark the StorageClass as default
+# Then mark the StorageClass as the default
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 ```
 
