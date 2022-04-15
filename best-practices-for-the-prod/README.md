@@ -27,11 +27,8 @@ The doc is [here](https://open-policy-agent.github.io/gatekeeper/website/docs/in
 ## Create your first policy
 
 Write your own policy to ensure a pod does not have the `latest` tag.
-You can consult this [page](https://www.magalix.com/blog/enforce-that-all-kubernetes-container-images-must-have-a-label-that-is-not-latest-using-opa)
-
 
 Then, push the policy via a Gatekeeper CRD.
-
 An example is [here](https://github.com/open-policy-agent/gatekeeper/blob/master/example/templates/k8srequiredlabels_template.yaml)
 
 
