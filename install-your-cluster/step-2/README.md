@@ -7,7 +7,7 @@ Examine the DaemonSet to answer the following questions:
 * How is that achieved?
 * What are the ports they exposed?
 
-Ask your trainer to indicate the public DNS record for the workers and try to connect to the exposed Nginx.
+Ask your trainer to indicate the public DNS record for the `lb` and try to connect to the exposed Nginx.
 
 ## StorageClass and provisioner
 

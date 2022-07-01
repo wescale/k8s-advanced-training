@@ -45,6 +45,9 @@ mkdir -p ~/.kube
 cp kube_config_cluster.yml ~/.kube/config
 # test your cluster
 kubectl cluster-info
+# enable kubectl completion
+echo 'source <(kubectl completion bash)' >>~/.bashrc
+source <(kubectl completion bash)
 ```
 
 ## Labels your domain of failure / topology key
