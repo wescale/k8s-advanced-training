@@ -65,7 +65,7 @@ To access the service we need to get the ingress-gateway NodeIP and port
 ```sh
 export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
 # Replace X with your environment
-export INGRESS_HOST=lb.wsc-kubernetes-adv-training-X.wescaletraining.fr
+export INGRESS_HOST=lb.k8s-ops-X.wescaletraining.fr
 ```
 Accessing services
 ```sh
@@ -125,12 +125,12 @@ watch -n 1 curl -o /dev/null -s -w %{http_code} http://$INGRESS_HOST:$INGRESS_PO
 
 Visualise trafic graph with kiali (replace x with your trainee index)
 
-http://lb.wsc-kubernetes-adv-training-x.wescaletraining.fr:30672/kiali/console/graph/namespaces/?edges=responseTime&graphType=versionedApp&unusedNodes=false&operationNodes=false&injectServiceNodes=true&duration=60&refresh=10000&namespaces=mesh&layout=dagre
+http://lb.k8s-ops-x.wescaletraining.fr:30672/kiali/console/graph/namespaces/?edges=responseTime&graphType=versionedApp&unusedNodes=false&operationNodes=false&injectServiceNodes=true&duration=60&refresh=10000&namespaces=mesh&layout=dagre
 
 
 Multiple graphs are available on grafana explore them
 
-http://lb.wsc-kubernetes-adv-training-x.wescaletraining.fr:31717/d/LJ_uJAvmk/istio-service-dashboard?orgId=1&refresh=1m&var-datasource=default&var-service=productpage.mesh.svc.cluster.local&var-srcns=All&var-srcwl=All&var-dstns=All&var-dstwl=All
+http://lb.k8s-ops-x.wescaletraining.fr:31717/d/LJ_uJAvmk/istio-service-dashboard?orgId=1&refresh=1m&var-datasource=default&var-service=productpage.mesh.svc.cluster.local&var-srcns=All&var-srcwl=All&var-dstns=All&var-dstwl=All
 
 
 

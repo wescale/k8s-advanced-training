@@ -3,9 +3,9 @@ services:
     audit_log:
       enabled: true
       configuration:
-        max_age: 6
-        max_backup: 6
-        max_size: 110
+        max_age: 1
+        max_backup: 1
+        max_size: 20
         path: /var/log/kube-audit/audit-log.json
         format: json
         policy:

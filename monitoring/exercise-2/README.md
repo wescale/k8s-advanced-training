@@ -58,9 +58,9 @@ kubectl apply -f monitoring-services.yaml -n monitoring
 ```
 
 Open you browser (replace `X` with your env number):
-* Prometheus: http://lb.wsc-kubernetes-adv-training-X.wescaletraining.fr:32601
-* Alert Manager http://lb.wsc-kubernetes-adv-training-X.wescaletraining.fr:32602
-* Grafana: http://lb.wsc-kubernetes-adv-training-X.wescaletraining.fr:32603
+* Prometheus: http://lb.k8s-ops-X.wescaletraining.fr:32601
+* Alert Manager http://lb.k8s-ops-X.wescaletraining.fr:32602
+* Grafana: http://lb.k8s-ops-X.wescaletraining.fr:32603
 
 ### Add dashboards on Grafana
 
@@ -184,20 +184,42 @@ http://<external-ip>:Node_Port
 
 You should see the familiar WordPress init page.
 
-## Add prometheus exporters
+## Monitor the SQL database
 
-You will complete your stack to:
-* add a [mysqld_exporter](https://github.com/prometheus/mysqld_exporter/blob/master/README.md) sidecar to the mysql container. With this sidecar the mysql pods can expose metrics and Prometheus will collect them.
-* deploy a [backboxexporter](https://github.com/prometheus/blackbox_exporter) to call your wordpress application and ensure it is running
+You will enrich the stack to add a [mysqld_exporter](https://github.com/prometheus/mysqld_exporter/blob/master/README.md) sidecar to the mysql container. With this sidecar the mysql pods can expose metrics and Prometheus will collect them.
+
+Then, you will instruct Prometheus it can scrape this exporter using a Pod Monitor.
 
 ### Monitor the mysql pods
 
-Edit the mysql-deployment to add mysqld_exporter.
+Edit the `wordpress-mysql` to add a [mysqld_exporter](https://github.com/prometheus/mysqld_exporter/blob/master/README.md) sidecar.
 Ensure your pod starts without errors in the logs and your wordpress still works.
+
+You can use the following snippet to add a sidecar container to the mysql container:
+```yaml
+   spec:
+      containers:
+      - name: mysql
+        # Sidecar container
+      - name: prom-mysql
+        image: prom/mysqld-exporter
+        env:
+         # Configure the container to connect to the mysql container.
+         # Expected environment variable name is DATA_SOURCE_NAME
+         # You may use intermediary environment variables to build the value of DATA_SOURCE_NAME
+        ...
+        ports:
+        - containerPort: 9104
+          name: exporter    
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+```
 
 ### Add a PodMonitor for the mysql spod
 
-Create a [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#podmonitor) CRD to monitor the pod wordpress-mysql on *port* 9104.
+Create a [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#podmonitor) CRD to monitor the pod `wordpress-mysql` on *port* 9104.
 
 Wait 1 minute and ensure you see this target in the Prometheus /targets
 
