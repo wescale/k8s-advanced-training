@@ -20,7 +20,7 @@ Inside this namespace, create a `LimitRange` named `resource-constraints-lr` whi
 For details about the LimitRange specification, use `kubectl explain` command or see the online documentation for your current Kubernetes version.
 
 ```
-apiVersion: apps/v1
+apiVersion: v1
 kind: LimitRange
 metadata:
   name: resource-constraints-lr

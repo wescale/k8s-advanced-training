@@ -77,6 +77,8 @@ kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
 The serviceAccountName key is set with the name of the default ServiceAccount.
 The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of volume, in `/var/run/secrets/kubernetes.io/serviceaccount`
 
+You will request the API server from the pod. For that, use `wget` or `curl` (to install `curl`, run: `apk update && apt install curl`).
+
 - Try from the container to get information from the API server (endpoint: `https://kubernetes.default.svc/api/v1`) without authentication.
   What do you notice ?
 
@@ -106,16 +108,17 @@ What kind of Role do you need ? Role ou ClusterRole ?
 apiVersion: v1
 kind: Pod
 metadata:
- name: pod-sa
- namespace: wsc-kubernetes-training-sa
+  name: pod-sa
+  namespace: wsc-kubernetes-training-sa
 spec:
- serviceAccountName: training-sa
- - name: alpine
-   image: alpine:3.9
-   command:
-    - "sleep"
-    - "10000"
- ```
+  serviceAccountName: training-sa
+  containers:
+  - name: alpine
+    image: alpine:3.9
+    command:
+     - "sleep"
+     - "10000"
+```
 
 - Within your namespace, inside the new Pod, try to you use the token for your new sa to list all the Pods:  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods and 
  https://kubernetes.default.svc/api/v1/namespaces/default/pods

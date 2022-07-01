@@ -3,8 +3,10 @@ In this exercise, you will instanciate an ArgoCD and get familiar with basics of
 
 ## Install ArgoCD
 
+Create an `argocd` namespace.
+
+Then deploy ArgoCD:
 ```sh
-kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 
@@ -38,10 +40,11 @@ You should see your application.
 
 # Declarative manifests
 
-Look at the resources your kubernets cluster can manage (`kubectl api-resources`).
+Look at the resources your kubernetes cluster can manage (`kubectl api-resources`).
 What are the resources provided by **argo**?
 
-Edit the `application.yaml` to declare an ArgoCD application named `declarative-gitops-chart` to deploy the same Helm chart as above.
+Edit the given `application.yaml` to declare an ArgoCD application named `declarative-gitops-chart` to deploy the same Helm chart as above.
+
 This chart must be in the namespace `declarative-gitops`.
 
 Then apply the manifest: `kubectl apply -f application.yaml`

@@ -200,8 +200,9 @@ apiVersion: v1
 kind: Pod
 metadata:
  name: pod-sa
+ namespace: wsc-kubernetes-training-sa
 spec:
- serviceAccountName: demo-sa
+ serviceAccountName: training-sa
  containers:
  - name: alpine
    image: alpine:3.9
