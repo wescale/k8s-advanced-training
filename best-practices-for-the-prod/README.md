@@ -12,12 +12,12 @@ Once who-can plugin is installed, run commands to determine:
 * who can create ClusterRoles?
 * who can get Secrets?
 
-# OpenPolicyAgent
+# Open Policy Agent with Gatekeeper
 
-In this exercise, you will write a policy to ensure no container reference the tag `latest`of an image.
+In this exercise, you will write a policy to ensure no container reference the tag `latest` of an image.
 This is very bad habit.
 
-## Install OPA
+## Install Getekeeper and so OPA
 
 You will install OpenPolicyAgent with Gatekeeper.
 
@@ -32,7 +32,7 @@ Then, push the policy via a Gatekeeper CRD.
 An example is [here](https://github.com/open-policy-agent/gatekeeper/blob/master/example/templates/k8srequiredlabels_template.yaml)
 
 
-Is your policy working?
+Is your policy working? Test it with a `nginx:latest` pod.
 
 Have you tested with a deployment resource? 
 
