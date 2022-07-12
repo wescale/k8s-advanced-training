@@ -62,12 +62,7 @@ To optimize this:
 
 ## for pods
 
-NB pods: min (cluster-cidr, min(nb nodes * pod CIDR per node, nb nodes * max nb of pods per node ))
-
-Values:
-* Cluster CIDR: --cluster-cidr=10.42.0.0/16
-* pod CIDR per node (`kubectl describe nodes`): 10.42.0.0/24
-* max number of pods per node (`kubectl describe nodes`) :110
+* max number of pods per node: kubectl get node worker-X -ojsonpath='{.status.capacity.pods}{"\n"}'
 
 ## for services
 
