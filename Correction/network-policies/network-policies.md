@@ -135,3 +135,9 @@ spec:
     - protocol: TCP
       port: 4443
 ```
+
+# Clean
+
+```sh
+./tf-runner.sh clean_network_policies
+```
