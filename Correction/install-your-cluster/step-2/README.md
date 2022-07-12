@@ -77,7 +77,12 @@ kubectl describe node worker-X
 
 ## for services
 
-Service CIDR: --service-cluster-ip-range=10.43.0.0/16
+```sh
+ssh -F provided_ssh_config master-0
+sudo su
+ps -ef|grep kube-controller
+```
+=> Service CIDR: --service-cluster-ip-range=10.43.0.0/16
 
 # Networking
 
