@@ -70,12 +70,12 @@ kubectl delete pod pod-with-special-name
 
 Now connect to any master node and look for the delete operation.
 
-## Update Strategy
+## Upgrade Strategy
 
 Any cluster will need to be updated at a moment.
 Different possibilities will be discussed later but in the case of an update of an existing cluster, the strategy must be carefully thought.
 
-Look at the `update_strategy` section of the current `cluster.yml` file.
+Look at the `upgate_strategy` section of the current `cluster.yml` file.
 A parameter is not acceptable for the production.
 
 Which one?
