@@ -2,7 +2,7 @@
 
 Backups of ETCD are a good starting point to recover from a disaster.
 
-RKE can configure automatic backups of etcd and send them to S3:
+RKE can configure automatic backups of etcd and send them to S3. In cluster.yml, you need to add etcd backup_config configuration:
 ```
 services:
   etcd:
