@@ -1,3 +1,9 @@
+# Preparation 
+
+To deploy wordpress in application namespace:
+
+start ./tf-runner.sh prepare_network_policies
+
 # Step 1 - Deny all traffic
 
 ```yaml
