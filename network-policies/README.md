@@ -25,7 +25,7 @@ Ensure the application is not accessible from your web browser.
 
 Create a network policy to allow ingress traffic to TCP:80 and TCP:443 from Internet to the `nginx` pods.
 
-You should get HTTP 503 errors in your web browser.
+You should get HTTP 503 errors in your web browser. (service unavailable)
 
 # Step 3 - Allow traffic to the database
 
