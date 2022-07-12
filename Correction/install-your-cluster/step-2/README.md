@@ -62,7 +62,12 @@ To optimize this:
 
 ## for pods
 
-* Default value max number of pods per node: kubectl get node worker-X -ojsonpath='{.status.capacity.pods}{"\n"}'
+* Default value max number of pods per node: 
+```sh
+kubectl get node worker-X -ojsonpath='{.status.capacity.pods}{"\n"}'
+```
+=> Default number of pods for each node: 110
+
 * Max number of pods:
 
 ```sh
