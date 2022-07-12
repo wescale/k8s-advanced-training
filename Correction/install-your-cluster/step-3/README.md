@@ -7,8 +7,8 @@ less /var/log/kube-audit/audit-log.json
 less -f /var/log/kube-audit/audit-log.json | grep pod-with-special-name | grep deletionTimestamp
 ```
 
-# Update strategy
+# Upgrade strategy
 
 `drain: false` is not acceptable as it will cause sudden pod deletion and potential loss of services.
 
-See [update strategy](https://rancher.com/docs/rke/latest/en/upgrades/configuring-strategy/)
+See [upgrade strategy](https://rancher.com/docs/rke/latest/en/upgrades/configuring-strategy/)
