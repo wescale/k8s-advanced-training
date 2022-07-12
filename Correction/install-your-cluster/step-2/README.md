@@ -2,7 +2,19 @@
 
 Nginx prods are deployed as a daemonSet -> 1 per node.
 
+Where are the nginx pods running?:
+
+```yaml
+kubectl get ns
+kubectl get po -n ingress-nginx
+kubectl get DaemonSet -n ingress-nginx
+```
+
+How is that achieved ?
+
 Yet, only 3 pods for a cluster with 3 masters and 3 workers... this is due to the taint `node-role.kubernetes.io/controlplane=true:NoSchedule` present on the masters.
+
+What are the ports they exposed?
 
 The daemonset exposes the nginx directly on the host port:
 ```yaml
@@ -22,6 +34,9 @@ The daemonset exposes the nginx directly on the host port:
 ```
 
 Because the workers have public IPs, you can join the nginx ingress pods using the `lb` DNS record which is a round robin the worker IPs.
+Ask your trainer to indicate the public DNS record for the lb and try to connect to the exposed Nginx ?
+
+https://lb.k8s-ops-X.wescaletraining.fr/
 
 # StorageClass and provisioner
 
