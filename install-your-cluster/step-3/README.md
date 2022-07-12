@@ -28,6 +28,7 @@ Here, we propose to explore backup/restore features. You will put the cluster in
 ```sh
 # run specific pods
 kubectl run important-pod --image=gcr.io/google-samples/hello-app:1.0 --port=8080
+kubectl get po
 # do snapshot
 rke etcd snapshot-save --name test-snapshot
 # change the cluster state
