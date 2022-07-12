@@ -93,6 +93,7 @@ That means IPIP overlay.
 Calico resources:
 ```sh
 kubectl api-resources |grep calico
+# An IP pool resource (IPPool) represents a collection of IP addresses from which Calico expects endpoint IPs to be assigned. 
 # Look at the pod CIDR seen by Calico
 kubectl get ippools/default-ipv4-ippool -o yaml
 # Look at the Calico allocation tables:
@@ -104,6 +105,7 @@ kubectl get ipamblocks
 ```sh
 # See ipipMode value
 kubectl get ippools/default-ipv4-ippool -o yaml
+=>   ipipMode: Always and vxlanMode: Never
 # See calico_backend: bird
-kubectl get configmap/calico-config -o yaml -n kube-system
+kubectl get configmap/calico-config -o yaml -n kube-system | grep calico_backend
 ```
