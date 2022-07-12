@@ -33,15 +33,18 @@ Questions:
 
 ## Capacity of the cluster
 
+
+* What is the max number of Pods created by this cluster?
+* What is the max number of Services created by this cluster?
+
+TRICK: 
+
 Connect to a master node to view the `cidrs`of the cluster:
 ```sh
 ssh -F provided_ssh_config master-0
 sudo su
 ps -ef|grep kube-controller
 ```
-
-* What is the max number of Pods created by this cluster?
-* What is the max number of Services created by this cluster?
 
 ## Networking
 
