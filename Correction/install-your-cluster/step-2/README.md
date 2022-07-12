@@ -62,7 +62,23 @@ To optimize this:
 
 ## for pods
 
-* max number of pods per node: kubectl get node worker-X -ojsonpath='{.status.capacity.pods}{"\n"}'
+Connect to a master node to view the `cidrs`of the cluster:
+```sh
+ssh -F provided_ssh_config master-0
+sudo su
+ps -ef|grep kube-controller
+```
+=> --cluster-cidr=10.42.0.0/16
+
+
+
+* Default value max number of pods per node: kubectl get node worker-X -ojsonpath='{.status.capacity.pods}{"\n"}'
+* Max number of pods:
+
+```sh
+kubectl describe node worker-X
+```
+=> 10.42.X.0/24 : 256 Ips so 256 Pods
 
 ## for services
 
