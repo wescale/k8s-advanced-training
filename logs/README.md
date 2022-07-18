@@ -24,7 +24,7 @@ spec:
       node.store.allow_mmap: false
 EOF
 
-# Wait it becomes green
+# Wait that the health becomes green (unknown -> green)
 kubectl get elasticsearch
 # Retrieve PASSWORD
 export PASSWORD=$(kubectl get secret quickstart-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
@@ -43,7 +43,7 @@ spec:
   elasticsearchRef:
     name: quickstart
 EOF
-# Wait it becomes green
+# Wait that the health becomes green (red -> green)
 kubectl get kibana
 # Port Forward
 kubectl port-forward service/quickstart-kb-http 5601
