@@ -8,3 +8,9 @@ kubectl describe pods xxx -n default-resources-config
 
 limits > requests => QoS burstable
 
+
+## Create a Deployment with only limits
+
+What do you see as QoS class? > Garanteed
+Why ? Limits = Resquested 
+
