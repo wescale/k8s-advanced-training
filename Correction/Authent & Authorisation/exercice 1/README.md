@@ -189,6 +189,7 @@ $ kubectl get role -n wsc-kubernetes-training-sa
 
 - Try to bind the Role and the ServiceAccount created above
 
+```sh
 $ kubectl apply -f training-role-binding-sa.yaml
 $ kubectl get rolebinding -n wsc-kubernetes-training-sa
  ```
