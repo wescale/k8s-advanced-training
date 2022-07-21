@@ -126,3 +126,5 @@ spec:
 What do you notice when you call the api namespaces/default/pods ?
 What is the solution to solve this ?
 
+- Delete the namespace `wsc-kubernetes-training-sa`
+
