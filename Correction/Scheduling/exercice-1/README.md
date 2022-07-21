@@ -17,7 +17,7 @@ The 4th pod is not scheduled, because we have only 3 nodes and choose to distrub
 
 What do you suggest as an improvement?
 
-Use topologySpreadConstraints
+Use preferredDuringSchedulingIgnoredDuringExecution and not required
 
 What will happen if you get 10 replicas?
 
