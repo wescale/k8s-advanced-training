@@ -2,13 +2,13 @@
 
 View the `QoS` class of the created pods and the resource requests/limits: 
 
-'''sh
+```sh
 kubectl get pods -n default-resources-config
-'''
+```
 
-'''sh
+```sh
 kubectl describe pods xxx -n default-resources-config
-'''
+```
 
 limits > requests => QoS burstable
 
