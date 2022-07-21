@@ -132,7 +132,7 @@ spec:
 Check pods status
 
 ```sh
-kubectl get pods -l app=apache  -n scheduling
+kubectl get pods -o wide -l app=apache  -n scheduling
 ```
 Can you explain what happened?
 
@@ -189,7 +189,7 @@ spec:
 
 See where the pods are scheduled
 ```sh
-kubectl get pods -l app=pause -n scheduling
+kubectl get pods -o wide -l app=pause -n scheduling
 ```
 
 Can you explain what happened ?
