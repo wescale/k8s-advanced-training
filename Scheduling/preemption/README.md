@@ -51,7 +51,7 @@ spec:
 ```
 
 ```sh
-kubectl apply -f resource-quota-deploy.yaml-n pc-demo
+kubectl apply -f resource-quota-deploy.yaml -n pc-demo
 ```
 
 You should see your pod.
