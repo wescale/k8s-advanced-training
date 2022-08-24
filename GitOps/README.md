@@ -1,4 +1,4 @@
-In this exercise, you will instanciate an ArgoCD and get familiar with basics of GitOps.
+In this exercise, you will instantiate an ArgoCD and get familiar with basics of GitOps.
 
 
 ## Install ArgoCD

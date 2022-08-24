@@ -1,4 +1,4 @@
-This exercice aims to configure the cluster API server to use OpenIDConnect (OIDC) tokens for user authentication.
+This exercise aims to configure the cluster API server to use OpenIDConnect (OIDC) tokens for user authentication.
 
 As indicated in the following schema, Kubernetes does not perform the OIDC authentication flow of the end-user.
 It just validates the given tokens and eventually refresh them if needed.
@@ -51,7 +51,7 @@ $ less .kube/config
 ```sh
 $ kubectl --user=<user@wescale.fr> get nodes
 ```
-- Now we can see that the user is getting authenticated, now it needs authorization. For that, we need to create a cluster role that can do everything in all k8s ressources.
+- Now we can see that the user is getting authenticated, now it needs authorization. For that, we need to create a cluster role that can do everything in all k8s resources.
 
 ```sh
 $ kubectl create -f clusterRole.yml

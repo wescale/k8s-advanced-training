@@ -6,7 +6,7 @@ After performing a rolling update to the version *v1.1*, you will do a rollback 
 
 ## Deploy the version v1
 
-Complete the provided `deployment-v1.0.yaml` file to in dicate the deployment strategy:
+Complete the provided `deployment-v1.0.yaml` file to in dictate the deployment strategy:
 ```
 strategy:
     type: RollingUpdate
@@ -20,7 +20,7 @@ Then create the deployment:
 kubectl apply -f deployment-v1.0.yaml
 ```
 
-## Ensure everythin is fine
+## Ensure everything is fine
 
 ```sh
 kubectl get deployments
@@ -36,7 +36,7 @@ kubectl expose deployment kdemo-dep \
 --port=80 \
 --target-port=8080
 ```
-ou 
+or 
 ```
 kubectl create -f service.yaml
 ```
@@ -54,7 +54,7 @@ kubectl apply -f deployment-v1.1.yaml
 watch kubectl get pods -o wide
 ```
 
-Verify you get a new version of the website in your broser.
+Verify you get a new version of the website in your browser.
 
 ## RollBack to v1.0
 ```sh
