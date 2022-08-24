@@ -29,7 +29,7 @@ spec:
       storage: 2Gi
 ```
 
-Declare the claim (be carefull, the provided `.yaml` file may be incorrect....)
+Declare the claim (be careful, the provided `.yaml` file may be incorrect....)
 ```sh
 kubectl apply -f pv-claim.yaml
 ```

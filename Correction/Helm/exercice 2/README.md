@@ -14,7 +14,7 @@ We put the Image repository and container ports for both backend and frontend. A
 
 - deployment.yaml
 
-We can create our template for deployment in templates/deployment.yaml. This template will be used to generate both backend-deployment.yamland frontend-deployment.yaml
+We can create our template for deployment in templates/deployment.yaml. This template will be used to generate both backend-deployment.yam land frontend-deployment.yaml
 
 - service.yaml
 This template will be used to generate both backend-service.yaml and frontend-service.yaml 

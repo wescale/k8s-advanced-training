@@ -8,7 +8,7 @@ Then, you will create 3 pods, each with or without requests and limits.
 
 Create a namespace named `default-resources-config`.
 
-## Create a LimitRange to specifiy default limits and requests
+## Create a LimitRange to specify default limits and requests
 
 Inside this namespace, create a `LimitRange` named `default-requests-and-limits` which sets the followings default values:
 * **Memory limit** must 64Mi

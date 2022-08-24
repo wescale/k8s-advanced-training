@@ -1,4 +1,4 @@
-This exercice aims to configure a ServiceAccount for Pods and accessing the API Server From a Pod
+This exercise aims to configure a ServiceAccount for Pods and accessing the API Server From a Pod
 
 A lot of applications that run in the cluster (read: running in Pods), need to communicate with the API server.
 For example, some applications might need to know:
@@ -176,7 +176,7 @@ serviceaccount/training-sa created
 
 - A ServiceAccount is not that useful unless certain rights are bound to it. Defines a Role allowing to list all the Pods in the your namespace.
 
-What kind of Role do you need ? Role ou ClusterRole ?
+What kind of Role do you need ? Role o ClusterRole ?
 > Role because, I just need to list all Pods in my namespace and not in others namespaces.
 
 
