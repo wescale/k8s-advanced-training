@@ -107,7 +107,6 @@ kubectl port-forward $POD_NAME 9000
 
 Open a tunnel in your local machine
 ```sh
-# Replace X with your environment number
 ssh -L 9000:localhost:9000 -F provided_ssh_config bastion
 ```
 
