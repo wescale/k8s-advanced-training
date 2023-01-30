@@ -7,7 +7,7 @@ metadata:
     component: "server"
     app: prometheus
     release: prometheus
-    chart: prometheus-11.16.2
+    chart: prometheus-19.3.3
     heritage: Helm
   name: prometheus
   namespace: istio-system
@@ -22,7 +22,7 @@ metadata:
     component: "server"
     app: prometheus
     release: prometheus
-    chart: prometheus-11.16.2
+    chart: prometheus-19.3.3
     heritage: Helm
   name: prometheus
   namespace: istio-system
@@ -297,7 +297,7 @@ metadata:
     component: "server"
     app: prometheus
     release: prometheus
-    chart: prometheus-11.16.2
+    chart: prometheus-19.3.3
     heritage: Helm
   name: prometheus
 rules:
@@ -339,7 +339,7 @@ metadata:
     component: "server"
     app: prometheus
     release: prometheus
-    chart: prometheus-11.16.2
+    chart: prometheus-19.3.3
     heritage: Helm
   name: prometheus
 subjects:
@@ -359,7 +359,7 @@ metadata:
     component: "server"
     app: prometheus
     release: prometheus
-    chart: prometheus-11.16.2
+    chart: prometheus-19.3.3
     heritage: Helm
   name: prometheus
   namespace: istio-system
@@ -385,7 +385,7 @@ metadata:
     component: "server"
     app: prometheus
     release: prometheus
-    chart: prometheus-11.16.2
+    chart: prometheus-19.3.3
     heritage: Helm
   name: prometheus
   namespace: istio-system
@@ -405,7 +405,7 @@ spec:
         component: "server"
         app: prometheus
         release: prometheus
-        chart: prometheus-11.16.2
+        chart: prometheus-19.3.3
         heritage: Helm
     spec:
       serviceAccountName: prometheus
@@ -424,7 +424,7 @@ spec:
               readOnly: true
 
         - name: prometheus-server
-          image: "prom/prometheus:v2.21.0"
+          image: "prom/prometheus:v2.41.0"
           imagePullPolicy: "IfNotPresent"
           args:
             - --storage.tsdb.retention.time=15d

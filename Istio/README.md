@@ -5,8 +5,8 @@ Istio hand-on
 
 ## Installing Istio
 ```sh
-curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.8.0 TARGET_ARCH=x86_64 sh -
-cd istio-1.8.0
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.16.1 TARGET_ARCH=x86_64 sh -
+cd istio-1.16.1
 export PATH=$PWD/bin:$PATH
 istioctl install --set profile=default -y
 ```
