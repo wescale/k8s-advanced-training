@@ -6,33 +6,32 @@ Each of you has 7 Virtual machines:
 * 3 VMs for the control plane
 * 3 VMs for the data plane
 
-In addition of the VMs, the trainer must give you a `provided_ssh_config` file and a number of environment `training-X`
-
 ## Deploy with RKE (10 minutes)
 
-You will use (Rancher Kubernetes Engine - RKE)[https://rancher.com/docs/rke/latest/en/].
+You will use [Rancher Kubernetes Engine - RKE](https://rancher.com/docs/rke/latest/en/).
 
 RKE is already installed on the bastion.
 
-To connect on the bastion instance, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) start an ssh agent to add the key and connect to the instance:
+To connect on the bastion instance, use the following command (you must authorize gcloud to use the Google Identity):
 ```sh
-chmod 400 kubernetes-formation
-eval "$(ssh-agent -s)"
+gcloud compute ssh training@bastion-0 --zone=europe-west1-b
+```
+
+Once connected to the bastion instance, load the cluster private key in the ssh agent (RKE needs this to connect to each VM):
+```sh
+wget https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation
+chmod 600 kubernetes-formation
 ssh-add kubernetes-formation
 # Ensure the key is present
 ssh-add -L 
-# SSH
-ssh -A -F provided_ssh_config bastion
-cd creds
-# you should see a cluster.yml file
-ls -lath
 ```
 
-Once connected to the bastion instance, use the provided `cluster.yml` file.
-Look at this file. In particular the `nodes` section.
+RKE will use the provided `creds/cluster.yml` file.
+Look at this file, in particular the `nodes` section.
 
 Now, you can build your cluster:
 ```sh
+cd creds
 rke up
 ```
 
