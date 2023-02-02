@@ -10,7 +10,7 @@ You will use [Rancher Kubernetes Engine - RKE](https://rancher.com/docs/rke/late
 
 RKE is already installed on the bastion.
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/wescale/k8s-advanced-training&cloudshell_tutorial=install-your-cluster/step-1/README.md&show=terminal&cloudshell_git_branch=feature/gcloud-tutorial)
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/wescale/k8s-advanced-training&cloudshell_tutorial=install-your-cluster/step-1/README.md&show=terminal&ephemeral=false&cloudshell_git_branch=feature/gcloud-tutorial)
 
 
 ## Connecting to the bastion
