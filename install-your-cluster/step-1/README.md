@@ -10,6 +10,8 @@ You will use [Rancher Kubernetes Engine - RKE](https://rancher.com/docs/rke/late
 
 RKE is already installed on the bastion.
 
+This exercise will take place in [Google Cloud Shell](shell.cloud.google.com) using the provided account and project.
+
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/wescale/k8s-advanced-training&cloudshell_tutorial=install-your-cluster/step-1/README.md&show=terminal&ephemeral=false&cloudshell_git_branch=feature/gcloud-tutorial)
 
 
@@ -17,6 +19,7 @@ RKE is already installed on the bastion.
 
 To connect on the bastion instance, use the following command and authorise gcloud to use the Google Identity:
 ```sh
+gcloud config set project wsc-kubernetes-adv-training-$PROJECT_NUMBER
 gcloud compute ssh training@bastion-0 --zone=europe-west1-b
 ```
 
