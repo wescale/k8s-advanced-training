@@ -6,11 +6,11 @@ Each of you has 7 Virtual machines:
 * 3 VMs for the control plane
 * 3 VMs for the data plane
 
-You will use (Rancher Kubernetes Engine - RKE)[https://rancher.com/docs/rke/latest/en/].
+You will use [Rancher Kubernetes Engine - RKE](https://rancher.com/docs/rke/latest/en/).
 
 RKE is already installed on the bastion.
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/wescale/k8s-advanced-training&cloudshell_tutorial=install-your-cluster/step-1/README.md)
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/wescale/k8s-advanced-training&cloudshell_tutorial=install-your-cluster/step-1/README.md&show=terminal&cloudshell_git_branch=feature/gcloud-tutorial)
 
 
 ## Connecting to the bastion
