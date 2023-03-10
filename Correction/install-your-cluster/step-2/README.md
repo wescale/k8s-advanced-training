@@ -36,7 +36,7 @@ The daemonset exposes the nginx directly on the host port:
 Because the workers have public IPs, you can join the nginx ingress pods using the `lb` DNS record which is a round robin the worker IPs.
 Ask your trainer to indicate the public DNS record for the lb and try to connect to the exposed Nginx ?
 
-https://lb.k8s-ops-X.wescaletraining.fr/
+http://lb.k8s-ops-X.wescaletraining.fr/
 
 # StorageClass and provisioner
 
