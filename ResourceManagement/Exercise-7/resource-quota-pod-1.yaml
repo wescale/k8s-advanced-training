@@ -11,6 +11,6 @@ spec:
         memory: "2Gi"
         cpu: 1.2
       requests:
-        memory: "1.3Gi"
+        memory: "130Mi"
         cpu: 0.8
  

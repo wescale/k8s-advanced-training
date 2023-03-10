@@ -77,7 +77,7 @@ spec:
         image: httpd:2.4
         resources:
           limits:
-            memory: "0.2Gi"
+            memory: "200Mi"
             cpu: 0.2
 ```
 
@@ -116,9 +116,11 @@ What do you see as QoS class?
 Why?
 
 ## Clean
-```
+
+```sh
 kubectl delete namespace default-resources-config
 ```
+
 ## Your opinion
 
 What values should you use for default limits and request?

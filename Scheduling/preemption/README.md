@@ -55,18 +55,24 @@ kubectl apply -f resource-quota-deploy.yaml -n pc-demo
 ```
 
 You should see your pod.
+
 Scale the deployment to 10 replicas.
 
 ## Deploy pods with a priority class
 
 Create a new deployment file using the `resource-quota-deploy.yaml` as a reference.
-Indicate the priority class `test-pc` in the pod spec.
-Hint: remember to change the selector in your new deployment to avoid conflict with `test-deploy`
-```
 
-Create the deployment on kubernetes. Is your pod running?
+Indicate the priority class `test-pc` in the pod spec.
+
+Hint: remember to change the selector in your new deployment to avoid conflict with `test-deploy`
+
+Create the deployment on kubernetes. 
+Is your pod running?
+
 Now scale your new deployment to 50 pods. Are they running?
+
+Are the replicas of `test-deploy` still running?
 
 ## Clean
 
-Delete the priority class and all the deployments in the `default` namespace.
+Delete the priority class and all the deployments in the `pc-demo` namespace.
