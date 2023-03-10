@@ -39,6 +39,12 @@ rke etcd snapshot-restore --name test-snapshot
 kubectl describe pod important-pod
 ```
 
+To finish this step, remove the pod:
+
+```sh
+kubectl delete pod/important-pod
+```
+
 ## Rotate the certificates
 
 Kubernetes involves a lot of certificates, which must be rotated in the case of a comprimised cert or just because they will soon expire.
@@ -55,12 +61,15 @@ Activating the audit logs of the api server is the only way to know who or what 
 
 For, that you have an example of configuration for RKE in `audit.yml`. Look at this file, in particular the `rules`.
 
+* Backup your `cluster.yml` file
+  * `cp cluster.yml cluster.yml.bu`
 * Append the `audit.yml` to your `cluster.yml`
 * Run `rke up` to update the cluster.
 
 Now, you can see relevant actions in `/var/log/kube-audit/audit-log.json` of a *control plane* node.
 
 Perform a test:
+
 ```sh
 # Create a pod
 kubectl run pod-with-special-name --image=gcr.io/google-samples/hello-app:1.0 --port=8080
@@ -70,7 +79,14 @@ kubectl delete pod pod-with-special-name
 
 Now connect to any master node and look for the delete operation.
 
-## Upgrade Strategy
+Because there is no `logrotate` configuration for the audit logs, disable them:
+
+```sh
+cp cluster.yml.bu cluster.yml
+rke up
+```
+
+## Update Strategy
 
 Any cluster will need to be updated at a moment.
 Different possibilities will be discussed later but in the case of an update of an existing cluster, the strategy must be carefully thought.

@@ -3,6 +3,7 @@
 Look at the resources deployed on the `ingress-nginx` namespace.
 
 Examine the DaemonSet to answer the following questions:
+
 * Where are the nginx pods running?
 * How is that achieved?
 * What are the ports they exposed?
@@ -33,13 +34,8 @@ Questions:
 
 ## Capacity of the cluster
 
+Connect to a master node to view the `cidrs` of the cluster:
 
-* What is the max number of Pods created by this cluster?
-* What is the max number of Services created by this cluster?
-
-TRICK: 
-
-Connect to a master node to view the `cidrs`of the cluster:
 ```sh
 ssh -F provided_ssh_config master-0
 sudo su
@@ -50,12 +46,13 @@ ps -ef|grep kube-controller
 
 Inspect the `cluster.yaml` file to determine the network plugin used by the cluster.
 
-Generally, netwok plugin are configured using Custom Resource Definition - CRDs. Those CRDs are additional Kubernetes objects. 
+Generally, netwok plugin are configured using Custom Resource Definition - CRDs. Those CRDs are additional Kubernetes objects.
+
 To list the available resources on a cluster: `kubectl api-resources`
 
-### Overlay network. 
+### Overlay network
 
-As seen, Calico is able to integrate or not overlays (IpInIP or VxLAN). 
+As seen, Calico is able to integrate or not overlays (IPinIP or VxLAN). 
 
 In the `kube-system` namespace, look at the `ippools` and `configmap/calico-config` objects. 
 
