@@ -56,7 +56,7 @@ This directory is a local folder on each node -> data are stuck to a node.If a n
 
 To optimize this:
 * either keep local path provisioner and mount `/opt/local-path-provisioner` to a remote storage system (NFS, SAN)
-* better: use another storage class with a driver to provision PV on a remote storage.
+* better: use another storage class with a [CSI driver](https://kubernetes-csi.github.io/docs/drivers.html) to provision PV on a remote storage.
 
 # Capacity of the cluster
 
