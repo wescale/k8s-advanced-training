@@ -68,7 +68,7 @@ As a result, the **wordpress** pods fail to pass the readiness probes.
 
 ```sh
 # retrieve labels of the wordpress pods and mariadb
-kubectl get pods -n application -o=jsonpath='{.items[*].metadata.labels}'
+kubectl get pods -n application -o=jsonpath='{.items[*].metadata.labels}'|jq ''
 ```
 
 ```yaml
