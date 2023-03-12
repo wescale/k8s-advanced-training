@@ -3,6 +3,12 @@ This exercise aims to configure the cluster API server to use OpenIDConnect (OID
 As indicated in the following schema, Kubernetes does not perform the OIDC authentication flow of the end-user.
 It just validates the given tokens and eventually refresh them if needed.
 
+![oidc-flow](./oidc-flow.png)
+
+To demonstrate that, we are setting up a Keycloak instance as a docker container on the bastion instance for conveniance.
+We are generating a custom certificate with certbot for SSL communication as it is needed by Kubernetes.
+Once OIDC authentication configured, we create a custom user on keycloak and demonstrate how to log on the Kubernetes cluster and how RBAC is mapped.
+
 # Install prerequisites
 
 ```bash
