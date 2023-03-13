@@ -152,6 +152,8 @@ Modify the Filebeat definition to deploy pods also on the master nodes.
 
 Once updated, ensure you see 6 available / expected pods for `kubectl get beat -n logs`.
 
+**`kubectl apply -f es/filebeat-solution.yaml -n log`**
+
 Wait few minutes, and should see log entries for the query `agent.hostname: master-*`
 
 ### Clean

@@ -102,6 +102,8 @@ Complete the following command to create the kubernetes secret `mysql-pass` from
 kubectl create secret generic mysql-pass -n wordpress COMPLETE_THE_COMMAND
 ```
 
+**`kubectl create secret generic mysql-pass -n wordpress --from-file=password.txt`**
+
 Now, the MySQL pods can be launched. Start MySQL using [mysql-deployment.yaml](./mysql-deployment.yaml).
 
 Take a look at [mysql-deployment.yaml](./mysql-deployment.yaml), and note that we've defined a volume mount for /var/lib/mysql, and then created a Persistent Volume Claim that looks for a 2G volume. This claim is satisfied by any volume that meets the requirements.
