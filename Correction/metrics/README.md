@@ -177,6 +177,8 @@ You can use the following snippet to add a sidecar container to the mysql contai
           claimName: mysql-pv-claim
 ```
 
+**`kubectl apply -f mysql-deployment.yaml`**
+
 Ensure your pod starts without errors in the logs and your wordpress still works.
 
 Because the sidecar declares a new port, do not forget to add the `mysqld-exporter` to the service `wordpress-mysql` port list.
@@ -198,6 +200,8 @@ spec:
   endpoints:
   - port: SCRAPPED_PORT_TO_BE_SET
 ```
+
+**`kubectl apply -f service-monitor.yml`**
 
 Wait 1 minute and ensure you see this target in the Prometheus /targets
 
@@ -231,6 +235,8 @@ spec:
           labels:
             severity: warning
 ```
+
+**`kubectl apply -f prom-rule.yaml`**
 
 ### Monitor Wordpress
 
@@ -313,6 +319,9 @@ spec:
 ```
 
 Create this probe.
+
+**Edit the port in blackbox-exporter-probe.yml. Then:**
+**`kubectl apply -f blackbox-exporter-probe.yml`**
 
 Then wait 1 minute to check the `wordpress-website` target is visible in `/targets` endpoint of your Prometheus.
 
