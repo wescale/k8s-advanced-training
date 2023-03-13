@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: wordpress-website
+  namespace: wordpress
+spec:
+  interval: 60s
+  module: http_2xx
+  prober:
+    url: bbox-exporter-prometheus-blackbox-exporter.bbox-exporter.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - http://lb.k8s-ops-0.wescaletraining.fr:31011/

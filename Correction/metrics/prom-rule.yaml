@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mysql-prom-up
+  namespace: wordpress
+spec:
+  groups:
+    - name: wordpress.mysql
+      rules:
+        - alert: NoRunningMysql
+          annotations:
+            description: Targets are down.
+            summary: Targets are down
+          expr: up{app="wordpress",tier="mysql", namespace="wordpress"} < 1
+          for: 10m
+          labels:
+            severity: warning
