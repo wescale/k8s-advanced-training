@@ -17,37 +17,52 @@ For example, some applications might need to know:
 kubectl get sa --all-namespaces | grep default
  ```
 
-- Let’s inspect the ServiceAccount named `default` for your namespace
-
+- Create a secret in the `wsc-kubernetes-training-sa` namespace with a token for the `default` service account
 ```sh
-kubectl get sa default -n wsc-kubernetes-training-sa -o yaml
- ```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: default-sa
+  namespace: wsc-kubernetes-training-sa
+  annotations:
+    kubernetes.io/service-account.name: default
+type: kubernetes.io/service-account-token
+```
 
-- We can see here that a Secret is provided to this ServiceAccount. Let’s have a closer look at this one 
-
-```sh
-kubectl get secret <name token> -n wsc-kubernetes-training-sa -o yaml
- ```
-
-There are several key/value pairs under the data key of this Secret. The key that interests us is token:
+There are several key/value pairs under the data key. The key that interests us is token:
 
 - ca.crt is the Base64 encoding of the cluster certificate.
 - namespace is the Base64 encoding of the current namespace.
 - token is the Base64 encoding of the JWT used to authenticate against the API server.
 
-Let’s focus on the token and try to decode it: use command line base64(or https://www.base64decode.org/) and jwt.io. 
+Let’s focus on the token and try to decode it: use command line base64(or https://www.base64decode.org/) and https://jwt.io. 
 Look on the payload:
 
 ```sh
 {
-  "iss": "kubernetes/serviceaccount",
-  "kubernetes.io/serviceaccount/namespace": "wsc-kubernetes-training-sa",
-  "kubernetes.io/serviceaccount/secret.name": "default-token-jpzfm",
-  "kubernetes.io/serviceaccount/service-account.name": "default",
-  "kubernetes.io/serviceaccount/service-account.uid": "e8125353-bf49-4a41-b687-f32a79d77770",
-  "sub": "system:serviceaccount:wsc-kubernetes-training-sa:default"
+  "aud": [
+    "unknown"
+  ],
+  "exp": 1678723772,
+  "iat": 1678720172,
+  "iss": "rke",
+  "kubernetes.io": {
+    "namespace": "default",
+    "serviceaccount": {
+      "name": "default",
+      "uid": "736679dd-3cb1-4d94-9e67-db61db763ec3"
+    }
+  },
+  "nbf": 1678720172,
+  "sub": "system:serviceaccount:default:default"
 }
  ```
+
+
+**Note that it's a security best practice to generate short lived token with the following command**
+```sh
+kubectl create token default --duration=1h
+```
 
 How to use this default token from within a simple Pod: 
 
@@ -70,11 +85,11 @@ spec:
 
 ```sh
 kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
-  ```
+```
 
 - Verify that the same default sa is used 
 
-The serviceAccountName key is set with the name of the default ServiceAccount.
+The serviceAccountName key is set with the name of the `default` ServiceAccount.
 The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of volume, in `/var/run/secrets/kubernetes.io/serviceaccount`
 
 You will request the API server from the pod. For that, use `wget` or `curl` (to install `curl`, run: `apk update && apt install curl`).
