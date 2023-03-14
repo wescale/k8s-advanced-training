@@ -8,9 +8,9 @@ https://github.com/bitpoke/mysql-operator
 Install the operator with helm
 
 ```sh
-helm repo add presslabs https://presslabs.github.io/charts
+helm repo add bitpoke https://helm-charts.bitpoke.io
 helm repo update
-helm install mysql-operator presslabs/mysql-operator
+helm install mysql-operator bitpoke/mysql-operator
 ```
 
 Check the operator controller is deployed
@@ -24,7 +24,7 @@ mysql-operator-0   2/2     Running   0          41s
 The operator extended K8S api server with 2 new api resources
 
 ```sh
-kubectl get crd | grep "presslabs"
+kubectl get crd | grep "mysql"
 mysqlbackups.mysql.presslabs.org            2020-11-24T15:26:31Z
 mysqlclusters.mysql.presslabs.org           2020-11-24T15:26:31Z
 ```
@@ -65,7 +65,7 @@ kubectl get pvc
 Test the connection to the database
 
 ```sh
-kubectl run mysql-client --image=mysql:5.7 -it --rm --restart=Never -- /bin/bash
+kubectl run mysql-client --image=mysql:8 -it --rm --restart=Never -- /bin/bash
 #then in the container prompt
 mysql -h my-db-mysql -uroot -pdbsecret -e 'SELECT 1'
 ```
@@ -82,7 +82,7 @@ In order to save the backup we will deploy a minio s3 server
 ```sh
 helm repo add minio https://helm.min.io/
 helm repo update
-helm install minio --set accessKey=myaccesskey,secretKey=mysecretkey,resources.requests.memory=1G  minio/minio
+helm install minio --set accessKey=myaccesskey,secretKey=mysecretkey,resources.requests.memory=1G,defaultBucket.enabled=true,defaultBucket.name=mysql  minio/minio
 ```
 Then we create the secret to access minio server
 ```sh
