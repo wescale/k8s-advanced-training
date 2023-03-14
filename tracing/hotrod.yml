@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jaeger-hotrod
+  labels:
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/instance: demo
+    app.kubernetes.io/version: "1.42.0"
+    app.kubernetes.io/component: hotrod
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-hotrod
+  labels:
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/instance: demo
+    app.kubernetes.io/version: "1.42.0"
+    app.kubernetes.io/component: hotrod
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/instance: demo
+    app.kubernetes.io/component: hotrod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger-hotrod
+  labels:
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/instance: demo
+    app.kubernetes.io/version: "1.42.0"
+    app.kubernetes.io/component: hotrod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jaeger
+      app.kubernetes.io/instance: demo
+      app.kubernetes.io/component: hotrod
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/instance: demo
+        app.kubernetes.io/component: hotrod
+    spec:
+      securityContext: {}
+      serviceAccountName: jaeger-hotrod
+      containers:
+        - name: jaeger-hotrod
+          securityContext: {}
+          image: jaegertracing/example-hotrod:1.42.0
+          imagePullPolicy: IfNotPresent
+          # "-j" option set the endpoint to generate 'find trace' links
+          # Change the X wit your cluster number
+          args: ["all", "-j", "http://lb.k8s-ops-X.wescaletraining.fr"]
+          env:
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              # The application directly call the collector. It needs to know the Jaeger collector endpoint
+              # NOTE: the service is in the `tracing`namespace
+              value: http://COLLECTOR_DNS:14268/api/traces
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
