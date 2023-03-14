@@ -2,7 +2,7 @@
 
 You will install the [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus) monitoring stack and experience how it works.
 
-In a second time, you will deploy a wordpress application then monitor it with Prometheus and Grafana. To achieve that, you will
+In a second time, you will deploy a wordpress application then monitor it with Prometheus and Grafana. To achieve that, you will:
 
 * monitor mysql:
   * add a `mysql-exporter`
@@ -10,8 +10,8 @@ In a second time, you will deploy a wordpress application then monitor it with P
   * create a dashboard on Grafana to verify your PromQL
   * add a PrometheusRule to ensure you always have a mysql running.
 * monitor the wordpress webapp
-  * deploy a BlackBox infrastructure
-  * add a BlackBoxExporter resources to telleto getXXX
+  * deploy a BlackBox exporter infrastructure
+  * add a Probe resource to tell Prometheus it must monitor your wordpress via the BlackBox exporter infrastructure
 
 ## Install
 
@@ -33,8 +33,8 @@ Among those CRDs, a `Prometheus` kind is now available on the cluster. The Helm 
 
 Regarding this resource, answer the following questions:
 
-* Is the resource highly available ?
-* Are there selectors on the Probes, ServiceMonitors, PodMonitors and Rules ?
+* Is the resource highly available?
+* Are there selectors on the Probes, ServiceMonitors, PodMonitors and Rules?
 
 Using selectors allows to get several `Prometheus` instances each being isolated from others.
 
@@ -69,7 +69,9 @@ Navigate through th UI to see the Alerts.
 You see the list of community recommended alerts.
 Each alert has a meaning, an impact, a disgnosis and a mitigation that can be found on [https://runbooks.prometheus-operator.dev/](https://runbooks.prometheus-operator.dev/)
 
-Look at the currently `firing` alerts. Some are critical. Yet the cluster is functionnal. Why?
+Look at the currently `firing` alerts. Some are critical. Yet the cluster is functionnal. 
+
+Why?
 
 ## Play with Grafana
 
@@ -125,7 +127,7 @@ Here we are using many of the same features, such as a volume claim for persiste
 
 The WordPress image accepts the database hostname through the environment variable WORDPRESS_DB_HOST. We set the env value to the name of the MySQL service we created: wordpress-mysql.
 
-Ensure everything is fine with
+Ensure everything is fine with:
 
 ```sh
 kubectl get deployment,pod,svc,endpoints,pvc -l app=wordpress -o wide -n wordpress && \
@@ -180,7 +182,7 @@ Ensure your pod starts without errors in the logs and your wordpress still works
 
 Because the sidecar declares a new port, do not forget to add the `mysqld-exporter` to the service `wordpress-mysql` port list.
 
-Now, you must instruct Prometheus to scrape this exporter. To do that, create a ServiceMonitor by completing this snippet:
+Now, you must instruct Prometheus to scrape this exporter. To do that, create a [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitor) by completing this snippet:
 
 ```yaml
 apiVersion: monitoring.coreos.com/v1
@@ -193,9 +195,9 @@ metadata:
 spec:
   selector:
     matchLabels:
-      SERVICE_LABELS_TO_BE_SET
+      LABELS_OF_THE_MYSQL_SERVICE
   endpoints:
-  - port: SCRAPPED_PORT_TO_BE_SET
+  - port: EXPORTER_PORT
 ```
 
 Wait 1 minute and ensure you see this target in the Prometheus /targets
@@ -226,7 +228,7 @@ spec:
             summary: Targets are down
           # Hint: use the `up` metric
           expr: PROM_QL_QUERY_TO_BE_COMPLETED
-          for: 10m
+          for: 1m
           labels:
             severity: warning
 ```
@@ -285,7 +287,7 @@ You can now use this Blackbox infrasructure to run HTTP tests on `google.com`:
 ```sh
 kubectl run test -ti --image=busybox -- sh
 # Inside the pod
-wget -O- http://bbox-exporter-prometheus-blackbox-exporter.bbox-export.svc.cluster.local:9115/probe?target=google.com
+wget -O- http://bbox-exporter-prometheus-blackbox-exporter.bbox-export.svc.cluster.local:9115/probe?target=google.com&module=http_2xx
 ```
 
 #### Add an HTTP Probe to monitor the wordpress service
@@ -317,7 +319,7 @@ Then wait 1 minute to check the `wordpress-website` target is visible in `/targe
 
 Finally, consult the returned metrics opening `http://prometheus.k8s-ops-X.wescaletraining.fr/graph?g0.expr=%7Bjob%3D%22probe%2Fwordpress%2Fwordpress-website%22%7D&g0.tab=1&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h`. Replace the `-X` with your cluster number.
 
-To create an alert, create a new PrometheusRule for the `up{job="probe/wordpress/wordpress-website", namespace="wordpress"}`.
+To create an alert, create a new PrometheusRule for the expression `up{job="probe/wordpress/wordpress-website", namespace="wordpress"}`.
 
 ## Clean
 
