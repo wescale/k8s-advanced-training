@@ -6,33 +6,40 @@ Each of you has 7 Virtual machines:
 * 3 VMs for the control plane
 * 3 VMs for the data plane
 
-In addition of the VMs, the trainer must give you a `provided_ssh_config` file and a number of environment `training-X`
-
-## Deploy with RKE (10 minutes)
-
-You will use (Rancher Kubernetes Engine - RKE)[https://rancher.com/docs/rke/latest/en/].
+You will use [Rancher Kubernetes Engine - RKE](https://rancher.com/docs/rke/latest/en/).
 
 RKE is already installed on the bastion.
 
-To connect on the bastion instance, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) start an ssh agent to add the key and connect to the instance:
+This exercise will take place in [Google Cloud Shell](shell.cloud.google.com) using the provided account and project.
+
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/wescale/k8s-advanced-training&cloudshell_tutorial=install-your-cluster/step-1/README.md&show=terminal&ephemeral=false&cloudshell_git_branch=feature/gcloud-tutorial)
+
+
+## Connecting to the bastion
+
+To connect on the bastion instance, use the following command and authorise gcloud to use the Google Identity:
 ```sh
-chmod 400 kubernetes-formation
-eval "$(ssh-agent -s)"
+gcloud config set project wsc-kubernetes-adv-training-$PROJECT_NUMBER
+gcloud compute ssh training@bastion-0 --zone=europe-west1-b
+```
+
+Once connected to the bastion instance, load the cluster private key in the ssh agent.
+```sh
+wget https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation
+chmod 600 kubernetes-formation
 ssh-add kubernetes-formation
 # Ensure the key is present
 ssh-add -L 
-# SSH
-ssh -A -F provided_ssh_config bastion
-cd creds
-# you should see a cluster.yml file
-ls -lath
 ```
 
-Once connected to the bastion instance, use the provided `cluster.yml` file.
-Look at this file. In particular the `nodes` section.
+## Deploying with RKE
+
+RKE will use the provided `creds/cluster.yml` file.
+Look at this file, in particular the `nodes` section.
 
 Now, you can build your cluster:
 ```sh
+cd creds
 rke up
 ```
 
@@ -43,9 +50,15 @@ Copy it to the default location for kubectl:
 ```sh
 mkdir -p ~/.kube
 cp kube_config_cluster.yml ~/.kube/config
-# test your cluster
+```
+
+Test your cluster
+```sh
 kubectl cluster-info
-# enable kubectl completion
+```
+
+Enable kubectl completion
+```sh
 echo 'source <(kubectl completion bash)' >>~/.bashrc
 source <(kubectl completion bash)
 ```
