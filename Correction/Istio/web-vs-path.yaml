@@ -7,12 +7,8 @@ spec:
   - "*"
   gateways:
   - istio-system/http-gateway
-  http:
-  - fault:
-      # To be completed 
-      # See https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPFaultInjection
-      ...
-    match:
+  http:   
+  - match:
     - uri:
         prefix: "/nginx"
     rewrite:
@@ -25,7 +21,7 @@ spec:
       headers:
         response:
           set:
-            vs: "nginx-via-web-vs-withdelay"
+            vs: "nginx-via-web-vs"
   - match:
     - uri:
         prefix: "/apache"
@@ -39,4 +35,4 @@ spec:
       headers:
         response:
           set:
-            vs: "httpd-via-web-nodelay"
+            vs: "httpd-via-web-vs"
