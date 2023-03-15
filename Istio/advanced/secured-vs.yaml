@@ -1,0 +1,31 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: secured-bookinfo
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - istio-system/http-gateway
+  http:
+    - match:
+        - uri:
+            exact: /productpage
+          headers:
+            # "@request.auth" is populated by a `RequestAuthentication`.
+            "@request.auth.claims.groups":
+              # Must complete the expected value
+              exact: COMPLETE_VALUE
+        - uri:
+            prefix: /static
+        - uri:
+            exact: /login
+        - uri:
+            exact: /logout
+        - uri:
+            prefix: /api/v1/products
+      route:
+        - destination:
+            host: productpage
+            port:
+              number: 9080
