@@ -134,6 +134,11 @@ How do you decide if this data should go to span tag or span logs? The OpenTraci
 
 ## Clean
 
-Delete the hot R.O.D applciation: `kubectl -delete -f hotrod.yml`
-
-But keep cert-manager and jaeger installations for later hands-on.
+```sh
+kubectl -delete -f hotrod.yml
+kubectl delete ns tracing
+kubectl delete -n observability -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.42.0/jaeger-operator.yaml
+kubectl delete -n observability
+kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+kubectl delete ns cert-manager
+```
