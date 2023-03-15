@@ -1,0 +1,43 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: hello-vs
+spec:
+  gateways:
+  - istio-system/http-gateway
+  hosts:
+  - "hello.wescale.fr"
+  http:
+  - match:
+    # See https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPMatchRequest
+    # To add matching on header `allow-preview: true`
+    route:
+      - destination:
+          host: web
+          port:
+            number: 8080        
+          subset: v2
+  - route:
+    - destination:
+        host: web
+        port:
+          number: 8080        
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: hello-dr
+spec:
+  host: "web"
+  subsets:
+  - name: v1
+    labels:
+      app: hello
+      run: web1
+      version: v1
+  - name: v2
+    labels:
+      app: hello
+      run: web2
+      version: v2

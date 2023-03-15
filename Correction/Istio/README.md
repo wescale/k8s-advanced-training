@@ -2,8 +2,11 @@
 
 You will install Istio using the `istioctl` - the Istio CLI.
 
-Then you will get familiar with 
-Install Istio CTL to 
+Then you will get familiar with basic HTTP routing capabilities of Istio.
+
+You will explore more advanced features like fault injection, traffic shifting.
+
+To finish, you will see how Istio and Jaeger can provide powerfull observability for a micro service oriented application.
 
 ## Installing Istio
 

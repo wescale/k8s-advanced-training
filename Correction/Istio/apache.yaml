@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    app: apache
+  name: apache
+  namespace: mesh
+spec:
+  selector:
+    matchLabels:
+      app: apache
+  template:
+    metadata:
+      labels:
+        app: apache
+    spec:
+      containers:
+      - image: httpd
+        imagePullPolicy: IfNotPresent
+        name: apache
+        ports:
+        - containerPort: 80
+          protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: apache
+  name: apache
+  namespace: mesh
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: apache
+  type: ClusterIP
