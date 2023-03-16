@@ -32,6 +32,7 @@ kind: RequestAuthentication
 metadata:
   name: ingress-jwt
 spec:
+  selector: {}
   jwtRules:
   - issuer: "testing@secure.istio.io"
     jwksUri: "https://raw.githubusercontent.com/istio/istio/release-1.17/security/tools/jwt/samples/jwks.json"
