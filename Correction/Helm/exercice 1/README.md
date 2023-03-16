@@ -8,7 +8,7 @@ helm create simpleapp
 ```
 - Can you browse through all the  generated files : templates, values ... and try to understand how it works ? 
 - What is the default project in the chart helm ? 
-=> nginx
+There is none. It will be installed on the current namespace
 - Install the application. And voila you have an application up and running in the kubernetes cluster. Check it out.
 ```sh
 $ helm install simpleapp ./simpleapp
