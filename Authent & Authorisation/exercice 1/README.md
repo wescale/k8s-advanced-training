@@ -92,7 +92,7 @@ kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
 The serviceAccountName key is set with the name of the `default` ServiceAccount.
 The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of volume, in `/var/run/secrets/kubernetes.io/serviceaccount`
 
-You will request the API server from the pod. For that, use `wget` or `curl` (to install `curl`, run: `apk update && apt install curl`).
+You will request the API server from the pod. For that, use `wget` or `curl` (to install `curl`, run: `apk update && apk add curl`).
 
 - Try from the container to get information from the API server (endpoint: `https://kubernetes.default.svc/api/v1`) without authentication.
   What do you notice ?
