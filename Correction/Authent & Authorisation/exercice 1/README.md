@@ -61,7 +61,7 @@ Look on the payload:
 
 **Note that it's a security best practice to generate short lived token with the following command**
 ```sh
-kubectl create token default --duration=1h
+kubectl create token default -n wsc-kubernetes-training-sa --duration=1h
 ```
 
 How to use this default token from within a simple Pod: 
