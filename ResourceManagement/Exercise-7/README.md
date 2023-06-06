@@ -91,6 +91,8 @@ spec:
     ...
 ```
 
+See the given [resource-quota.yaml](./resource-quota.yaml) file.
+
 Get the current ResourceQuota usage:
 
 ```sh

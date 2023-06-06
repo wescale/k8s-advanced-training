@@ -22,9 +22,13 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: deny-all-ing
-  namespace: ingress-nginx
+  namespace: kube-system
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/instance: rke2-ingress-nginx
+      app.kubernetes.io/name: rke2-ingress-nginx
   policyTypes:
   - Ingress
 ```
@@ -41,13 +45,13 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: internet-to-proxy
-  namespace: ingress-nginx
+  namespace: kube-system
 spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/component: controller
-      app.kubernetes.io/instance: ingress-nginx
-      app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/instance: rke2-ingress-nginx
+      app.kubernetes.io/name: rke2-ingress-nginx
   policyTypes:
   - Ingress
   ingress:
@@ -122,13 +126,12 @@ spec:
   - from:
     - namespaceSelector:
         matchLabels:
-          app.kubernetes.io/instance: ingress-nginx
-          app.kubernetes.io/name: ingress-nginx
+          kubernetes.io/metadata.name: kube-system
       podSelector:
         matchLabels:
           app.kubernetes.io/component: controller
-          app.kubernetes.io/instance: ingress-nginx
-          app.kubernetes.io/name: ingress-nginx
+          app.kubernetes.io/instance: rke2-ingress-nginx
+          app.kubernetes.io/name: rke2-ingress-nginx
     ports:
     - protocol: TCP
       port: 8080

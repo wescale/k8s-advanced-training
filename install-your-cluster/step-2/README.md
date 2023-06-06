@@ -1,6 +1,6 @@
 ## IngressController
 
-Look at the resources deployed on the `ingress-nginx` namespace.
+Inside the `kube-system` namespace, look at the resources related to `ingress-nginx`.
 
 Examine the DaemonSet to answer the following questions:
 
@@ -44,17 +44,18 @@ ps -ef|grep kube-controller
 
 ## Networking
 
-Inspect the `cluster.yaml` file to determine the network plugin used by the cluster.
+On a master, inspect the `/etc/rancher/rke2/config.yaml` file to determine the network plugin used by the cluster.
 
-Generally, netwok plugin are configured using Custom Resource Definition - CRDs. Those CRDs are additional Kubernetes objects.
+Generally, a network plugin comes with Custom Resource Definition - CRDs to provide interactions for specific features. Those CRDs are additional Kubernetes objects.
 
-To list the available resources on a cluster: `kubectl api-resources`
+To list the available resources on a cluster: `kubectl api-resources`. Do you retrieve something for Calico?
 
 ### Overlay network
 
-As seen, Calico is able to integrate or not overlays (IPinIP or VxLAN). 
+Most of CNI deployments are based on a daemon set to get a pod managing the configuration on each node. This pod refers to a config map for its configuration.
 
-In the `kube-system` namespace, look at the `ippools` and `configmap/calico-config` objects. 
+Here, what is the daemonset? What is the config map?
 
-* Is there an ovelay network?
-* Is BGP (BIRD) used?
+As seen, Calico is able to integrate or not overlays (IPinIP or VxLAN).
+
+Look at the config map used for the CNI daemonset. Is there an ovelay network?

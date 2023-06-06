@@ -8,13 +8,18 @@ Each of you has 7 Virtual machines:
 
 In addition of the VMs, the trainer must give you a `provided_ssh_config` file and a number of environment `training-X`
 
-## Deploy with RKE (10 minutes)
+## Deploy with RKE2 (10 minutes)
 
-You will use (Rancher Kubernetes Engine - RKE)[https://rancher.com/docs/rke/latest/en/].
+You will use [Rancher Kubernetes Engine - RKE 2](https://docs.rke2.io/).
 
-RKE is already installed on the bastion.
+### Control plane
 
-To connect on the bastion instance, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) start an ssh agent to add the key and connect to the instance:
+At this stage, you get a cluster with the control plane initialized with RKE2, but the cluster has no worker.
+
+Ensure the control plane is OK by connecting to the bastion instance.
+
+For that, download the [private SSH key](https://raw.githubusercontent.com/WeScale/k8s-advanced-training/master/resources/kubernetes-formation) on you personal laptop and start an ssh agent to add the key and connect to the instance:
+
 ```sh
 chmod 400 kubernetes-formation
 eval "$(ssh-agent -s)"
@@ -23,31 +28,46 @@ ssh-add kubernetes-formation
 ssh-add -L 
 # SSH
 ssh -A -F provided_ssh_config bastion
-cd creds
-# you should see a cluster.yml file
-ls -lath
+# Ensure you see 3 master nodes
+kubectl get nodes
 ```
 
-Once connected to the bastion instance, use the provided `cluster.yml` file.
-Look at this file. In particular the `nodes` section.
+You will add 2 worker nodes (aka data agent nodes) in the RKE2 terminology.
 
-Now, you can build your cluster:
+For that, you will configure and start rke2-agent service on `worker-0` and `worker-1` nodes. To join an existing cluster, you need to pass the `token` generated during the bootstrap of the control plane, and indicate the cluster registration endpoint. The RKE2 binary is already installed on the workers.
+
 ```sh
-rke up
+# Connect to the worker
+ssh -F provided_ssh_config worker-0
+# See the content of the RKE2 configuration file
+cat ~/rke2-config.yaml
+# server: https://PUBLIC_K8S_API:9345
+# token: XXXXX
+#
+# Copy the RKE2 config file to the default location
+sudo mkdir -p /etc/rancher/rke2
+sudo cp /home/training/rke2-config.yaml /etc/rancher/rke2/config.yaml
+# Enable RKE2 agent on startup
+sudo systemctl enable rke2-agent.service
+# Start RKE2 agent service. This can take few minutes
+sudo systemctl start rke2-agent.service
+# Go back to the bastion instance
+exit
 ```
 
-This takes about 5 minutes.
-At the end, a kubeconfig has been generated.
+At the end, the worker nodes must be visible as members of the cluster:
 
-Copy it to the default location for kubectl:
+```sh
+# Ensure you see 5 nodes whose 2 workers
+kubectl get nodes
+```
+
+To finish this step, copy the kubeconfig file to the bastion instance:
+
 ```sh
 mkdir -p ~/.kube
-cp kube_config_cluster.yml ~/.kube/config
 # test your cluster
 kubectl cluster-info
-# enable kubectl completion
-echo 'source <(kubectl completion bash)' >>~/.bashrc
-source <(kubectl completion bash)
 ```
 
 ## Labels your domain of failure / topology key

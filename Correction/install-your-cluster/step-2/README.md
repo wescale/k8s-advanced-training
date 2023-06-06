@@ -6,8 +6,8 @@ Where are the nginx pods running?:
 
 ```yaml
 kubectl get ns
-kubectl get po -n ingress-nginx
-kubectl get DaemonSet -n ingress-nginx
+kubectl get all -n kube-system |grep ingress-nginx
+kubectl describe daemonset.apps/rke2-ingress-nginx-controller -n kube-system
 ```
 
 How is that achieved ?
@@ -86,26 +86,20 @@ ps -ef|grep kube-controller
 
 # Networking
 
-Network plugin: [calico with GCE](https://projectcalico.docs.tigera.io/getting-started/kubernetes/self-managed-public-cloud/gce).
+Current CNI is CANAL. Works great but Calico recommends to use the native VXLan/IPinIP mode without Flannel.
 
 That means IPIP overlay.
 
 Calico resources:
+
 ```sh
 kubectl api-resources |grep calico
-# An IP pool resource (IPPool) represents a collection of IP addresses from which Calico expects endpoint IPs to be assigned. 
-# Look at the pod CIDR seen by Calico
-kubectl get ippools/default-ipv4-ippool -o yaml
-# Look at the Calico allocation tables:
-kubectl get ipamblocks
 ```
 
 ## Overlay Network
 
 ```sh
-# See ipipMode value
-kubectl get ippools/default-ipv4-ippool -o yaml
-=>   ipipMode: Always and vxlanMode: Never
-# See calico_backend: bird
-kubectl get configmap/calico-config -o yaml -n kube-system | grep calico_backend
+kubectl get cm -n kube-system|grep canal
+# See CM content -> VXLAN and Calico
+kubectl get cm -n kube-system rke2-canal-config -o yaml
 ```
