@@ -34,7 +34,7 @@ kubectl get nodes
 
 You will add 3 worker nodes (aka data agent nodes) in the RKE2 terminology.
 
-For that, you will configure and start rke2-agent service on `worker-0` and `worker-1` nodes. To join an existing cluster, you need to pass the `token` generated during the bootstrap of the control plane, and indicate the cluster registration endpoint. The RKE2 binary is already installed on the workers.
+For that, you will configure and start rke2-agent service on `worker-0`, `worker-1` and `worker-2` nodes. To join an existing cluster, you need to pass the `token` generated during the bootstrap of the control plane, and indicate the cluster registration endpoint. The RKE2 binary is already installed on the workers.
 
 ```sh
 # Connect to the worker
