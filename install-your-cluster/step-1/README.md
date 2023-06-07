@@ -32,7 +32,7 @@ ssh -A -F provided_ssh_config bastion
 kubectl get nodes
 ```
 
-You will add 2 worker nodes (aka data agent nodes) in the RKE2 terminology.
+You will add 3 worker nodes (aka data agent nodes) in the RKE2 terminology.
 
 For that, you will configure and start rke2-agent service on `worker-0` and `worker-1` nodes. To join an existing cluster, you need to pass the `token` generated during the bootstrap of the control plane, and indicate the cluster registration endpoint. The RKE2 binary is already installed on the workers.
 
@@ -58,7 +58,7 @@ exit
 At the end, the worker nodes must be visible as members of the cluster:
 
 ```sh
-# Ensure you see 5 nodes whose 2 workers
+# Ensure you see 6 nodes whose 3 workers
 kubectl get nodes
 ```
 
