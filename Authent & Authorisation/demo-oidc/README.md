@@ -45,7 +45,7 @@ sudo certbot certonly --standalone --register-unsafely-without-email --preferred
 
 Launch a Keycloak server the generated certificate
 ```bash
-docker run -d -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=password --name keycloak -p 443:443 \
+sudo docker run -d -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=password --name keycloak -p 443:443 \
   -v /etc/letsencrypt/live/$BASTION_URL/fullchain.pem:/etc/x509/https/tls.crt \
   -v /etc/letsencrypt/live/$BASTION_URL/privkey.pem:/etc/x509/https/tls.key \
   docker.io/jboss/keycloak:16.1.1 -Djboss.https.port=443
