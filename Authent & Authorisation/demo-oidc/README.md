@@ -51,18 +51,18 @@ sudo docker run -d -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=password --name k
   docker.io/jboss/keycloak:16.1.1 -Djboss.https.port=443
 ```
 
+Activate the oidc authentication plugin on the API servers. For that, add the following attributes to **ALL** the masters in the `/etc/rancher/rke2/config.yaml` file.
 
-Configure the API server for OIDC authentication in the `cluster.yml` file
-```bash
-services:
-  kube-api:
-    extra_args:
-      oidc-issuer-url: https://bastion.k8s-ops-X.wescaletraining.fr/auth/realms/master
-      oidc-client-id: kubernetes
-      oidc-groups-claim: groups
-      oidc-groups-prefix: "keycloak:"
-      oidc-username-claim: email
+```yaml
+kube-apiserver-arg:
+ - oidc-issuer-url=https://bastion.k8s-ops-0.wescaletraining.fr/auth/realms/master
+ - oidc-client-id=kubernetes
+ - oidc-groups-claim=groups
+ - "oidc-groups-prefix=keycloak:"
+ - oidc-username-claim=email
 ```
+
+Then restart all the RKE2 server services: `systemctl restart rke2-server`.
 
 Create a Keycloak client with the following information
 - id: `kubernetes`
@@ -106,7 +106,6 @@ roleRef:
 Retrieve the `creds/kube_config_cluster.yml` file on your laptop
 ```bash
 scp -F provided_ssh_config bastion:/home/training/creds/kube_config_cluster.yml kubeconfig
-sed -i 's/master-0/$BASTION_URL/' kubeconfig
 export KUBECONFIG=kubeconfig
 ```
 
