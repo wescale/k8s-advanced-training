@@ -21,12 +21,13 @@ NAME               READY   STATUS    RESTARTS   AGE
 mysql-operator-0   2/2     Running   0          41s
 ```
 
-The operator extended K8S api server with 2 new api resources
+The operator extended K8S api server with new api resources
 
 ```sh
 kubectl get crd | grep "mysql"
 mysqlbackups.mysql.presslabs.org            2020-11-24T15:26:31Z
 mysqlclusters.mysql.presslabs.org           2020-11-24T15:26:31Z
+...
 ```
 The operator will listen to API requests on mysqlbackups and mysqlclusters to manage the mysql cluster
 ## Create a Mysql cluster
@@ -102,18 +103,13 @@ Verify in minio
 
 ```sh
 export POD_NAME=$(kubectl get pods --namespace default -l "release=minio" -o jsonpath="{.items[0].metadata.name}")
-kubectl port-forward $POD_NAME 9000
+kubectl port-forward --address 0.0.0.0 $POD_NAME 9000
 ```
 
-Open a tunnel in your local machine
-```sh
-ssh -L 9000:localhost:9000 -F provided_ssh_config bastion
-```
-
-URL: http://localhost:9000/minio/mysql/
-
+URL: http://BASTION_URL:9000/minio/mysql/
 
 Delete all the created resources:
+
 ```sh
 kubectl delete -f .
 helm uninstall minio
