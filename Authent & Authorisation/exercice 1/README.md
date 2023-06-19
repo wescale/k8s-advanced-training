@@ -90,14 +90,14 @@ kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
 - Verify that the same default sa is used 
 
 The serviceAccountName key is set with the name of the `default` ServiceAccount.
-The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of volume, in `/var/run/secrets/kubernetes.io/serviceaccount`
+The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of a projected volume, in the `/var/run/secrets/kubernetes.io/serviceaccount` folder.
 
 You will request the API server from the pod. For that, use `wget` or `curl` (to install `curl`, run: `apk update && apk add curl`).
 
 - Try from the container to get information from the API server (endpoint: `https://kubernetes.default.svc/api/v1`) without authentication.
   What do you notice ?
 
-- Try from the container to do the same call using the ServiceAccount token
+- Try from the container to do the same call using the ServiceAccount token in the `Authorization: Bearer` HTTP header
 
 - Try to you use this token to list all the Pods 
   - inside the default namespace: https://kubernetes.default.svc/api/v1/namespaces/default/pods
