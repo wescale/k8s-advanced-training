@@ -325,11 +325,13 @@ Create this probe.
 **Edit the port in blackbox-exporter-probe.yml. Then:**
 **`kubectl apply -f blackbox-exporter-probe.yml`**
 
-Then wait 1 minute to check the `wordpress-website` target is visible in `/targets` endpoint of your Prometheus.
+Then wait 1 minute to check the `wordpress-website` target is visible in `/targets` endpoint of your Prometheus (http://prometheus.k8s-ops-X.wescaletraining.fr)
 
 Finally, consult the returned metrics opening `http://prometheus.k8s-ops-X.wescaletraining.fr/graph?g0.expr=%7Bjob%3D%22probe%2Fwordpress%2Fwordpress-website%22%7D&g0.tab=1&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h`. Replace the `-X` with your cluster number.
 
 To create an alert, create a new PrometheusRule for the `up{job="probe/wordpress/wordpress-website", namespace="wordpress"}`.
+
+**`kubectl apply -f prom-rule-wordpress.yaml`**
 
 ## Clean
 

@@ -29,6 +29,8 @@ metadata:
 type: kubernetes.io/service-account-token
 ```
 
+Look inside the secret to see its content.
+
 There are several key/value pairs under the data key. The key that interests us is token:
 
 - ca.crt is the Base64 encoding of the cluster certificate.
@@ -81,10 +83,6 @@ spec:
     command:
       - "sleep"
       - "10000"
-```
-
-```sh
-kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
 ```
 
 - Verify that the same default sa is used 

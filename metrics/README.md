@@ -287,7 +287,7 @@ You can now use this Blackbox infrasructure to run HTTP tests on `google.com`:
 ```sh
 kubectl run test -ti --image=busybox -- sh
 # Inside the pod
-wget -O- http://bbox-exporter-prometheus-blackbox-exporter.bbox-export.svc.cluster.local:9115/probe?target=google.com&module=http_2xx
+wget -O- http://bbox-exporter-prometheus-blackbox-exporter.bbox-exporter.svc.cluster.local:9115/probe?target=google.com&module=http_2xx
 ```
 
 #### Add an HTTP Probe to monitor the wordpress service

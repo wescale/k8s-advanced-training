@@ -39,7 +39,7 @@ sudo usermod -aG docker training # Relaunch the ssh session
 
 Generate the certificate for the Keycloak instance
 ```bash
-export BASTION_URL=bastion.k8s-ops-X.wescaletraining.fr
+export BASTION_URL=bastion.k8s-ops-0.wescaletraining.fr
 sudo certbot certonly --standalone --register-unsafely-without-email --preferred-challenges http -d $BASTION_URL
 ```
 
@@ -105,7 +105,7 @@ roleRef:
 
 Retrieve the `creds/kube_config_cluster.yml` file on your laptop
 ```bash
-scp -F provided_ssh_config bastion:/home/training/creds/kube_config_cluster.yml kubeconfig
+scp -F provided_ssh_config bastion:/home/training/.kube/config kubeconfig
 export KUBECONFIG=kubeconfig
 ```
 
@@ -154,6 +154,6 @@ kubectl config set-credentials oidc \
 Show that we are connected as john@wescaletraining.fr
 ```bash
 kubectl whoami --user oidc
-kubectl get pods -A # it works
-kubectl get nodes # it does not work because we have the role viewer 
+kubectl --user oidc get pods -A # it works
+kubectl --user oidc get nodes # it does not work because we have the role viewer 
 ```
