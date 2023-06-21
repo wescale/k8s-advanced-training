@@ -36,6 +36,6 @@ spec:
       version: v1
   - name: v2
     labels:
-      app: helloe
+      app: hello
       run: web2
       version: v2

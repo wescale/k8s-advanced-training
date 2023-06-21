@@ -24,7 +24,7 @@ Then run port-forward to reach the service of `argocd server` on the bastion ins
 kubectl port-forward --address 0.0.0.0 -n argocd svc/SERVICE_NAME LOCALPORT:SERVICE_PORT
 ```
 
-Open a browser on https://<BASTION_IP>:8080, then login.
+Open a browser on https://<BASTION_URL>:8080, then login.
 
 What is the default cluster URL?
 

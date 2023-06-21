@@ -55,7 +55,7 @@ sudo systemctl start rke2-agent.service
 exit
 ```
 
-At the end, the worker nodes must be visible as members of the cluster:
+After few minutes, the worker nodes must be visible as `ready` members of the cluster:
 
 ```sh
 # Ensure you see 6 nodes whose 3 workers

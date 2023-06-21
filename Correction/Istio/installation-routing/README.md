@@ -81,10 +81,10 @@ To retrieve the expected key and value, look at the `mutatingwebhookconfiguratio
 Add the label:
 
 ```sh
-kubectl label namespace mesh LABEL_KEY=LABEL_VALUE
+kubectl label namespace mesh istio-injection=enabled
 ```
 
-The, deploy the 2 apps (nginx & apache) with their services:
+Then, deploy the 2 apps (nginx & apache) with their services:
 
 ```sh
 kubectl apply -f nginx.yaml -n mesh
@@ -246,7 +246,10 @@ kubectl apply -f web-dr-vs-canary.yaml -n mesh
 The virtual service routes traffic based on host header, to test the canary release execute several times the following command:
 
 ```sh
+while true; do
 curl --header "Host: hello.wescale.fr" http://$INGRESS_HOST:$INGRESS_PORT/:
+sleep 0.2
+done
 ```
 
 Verify that 90% of traffic is going to version 1 and the remaining 10% is going to version 2.

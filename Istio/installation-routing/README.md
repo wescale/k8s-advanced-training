@@ -32,7 +32,7 @@ kubectl get all -n istio-system
 
 The `default` profile deploys only two components:
 
-* an `ingress gateway` to manage incoming traffic to the cluster. Similar to an ingress controller.
+* an `istio-ingressgateway` to manage incoming traffic to the cluster. Similar to an ingress controller.
 * `istiod` which is the istio control plane.
 
 **Questions**:
@@ -84,7 +84,7 @@ Add the label:
 kubectl label namespace mesh LABEL_KEY=LABEL_VALUE
 ```
 
-The, deploy the 2 apps (nginx & apache) with their services:
+Then, deploy the 2 apps (nginx & apache) with their services:
 
 ```sh
 kubectl apply -f nginx.yaml -n mesh
@@ -103,9 +103,9 @@ Now, you must indicate how to route the traffic using this istio **http-gateway*
 kubectl apply -f web-vs-path.yaml -n mesh
 ```
 
-**Question**: What are the HTTP header names, added on responses by the VirtualService?
+**Question**: What are the HTTP headers added on responses by the VirtualService?
 
-To access the service you need to get the ingress-gateway NodeIP and port:
+To access the service you need to retrieve the ingress-gateway NodeIP and port:
 
 ```sh
 export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
@@ -191,7 +191,8 @@ selector:
     app: hello #This service is matching the 2 deployments
 ```
 
-Edit the given [web-dr-vs-canary.yaml](./web-dr-vs-canary.yaml) file to create a VirtualService and DestinationRule to achieve traffic shifting. For that, the VirtualService **hello-vs** references 2 subsets **v1** and **v2*.
+Edit the given [web-dr-vs-canary.yaml](./web-dr-vs-canary.yaml) file to create a VirtualService and a DestinationRule to achieve traffic shifting. For that, the VirtualService **hello-vs** references 2 subsets **v1** and **v2**.
+
 To get a working setup, you must declare a DestinationRule **hello-dr** which indicates how to the subsets are populated.
 
 90% of the traffic must go to **v1** and 10% must go to **v2**.
@@ -246,7 +247,10 @@ kubectl apply -f web-dr-vs-canary.yaml -n mesh
 The virtual service routes traffic based on host header, to test the canary release execute several times the following command:
 
 ```sh
+while true; do
 curl --header "Host: hello.wescale.fr" http://$INGRESS_HOST:$INGRESS_PORT/:
+sleep 0.2
+done
 ```
 
 Verify that 90% of traffic is going to version 1 and the remaining 10% is going to version 2.
