@@ -62,6 +62,7 @@ spec:
     config:
       # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-virtual-memory.html
       node.store.allow_mmap: false
+EOF
 ```
 
 Wait the instance becomes (unknown -> green):
