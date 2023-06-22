@@ -91,7 +91,7 @@ EOF
 # Wait that the health becomes green (red -> green)
 kubectl get kibana -n logs -w
 # Port Forward
-kubectl port-forward service/quickstart-kb-http  -n logs 5601 &
+kubectl port-forward service/quickstart-kb-http --address 0.0.0.0 -n logs 5601 &
 ```
 
 Now, you can open a browser on <https://bastion.k8s-ops-X.wescaletraining.fr:5601/login?next=%2F> (replace X with your cluster number) and enter the "elastic / ${PASSWORD}" credentials.
