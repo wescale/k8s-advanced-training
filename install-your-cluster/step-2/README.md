@@ -26,11 +26,68 @@ kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storagec
 
 Inspect the config maps of the related namespace, to determine where this StorageClass will create the persistent volumes.
 
-You can connect to the kubernetes nodes `ssh -F provided_ssh_config worker-0` to see their file system and mount points.
+install this and check were the PV will be deployed
+
+```sh
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pv
+  labels:
+    app: nginx
+spec:
+  containers:
+  - image: nginx:1.17.6
+    name: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+      - mountPath: "/usr/share/nginx/html"
+        name: nginx-pv-storage
+  volumes:
+    - name: nginx-pv-storage
+      persistentVolumeClaim:
+        claimName: test-pvc
+EOF
+
+kubect get po nginx-pv -o wide
+
+```
+
+You can connect to the kubernetes nodes `ssh -F provided_ssh_config worker-x` to see their file system and mount points.
+
+
+Back to bastion and explore PV and PVC
+
+```sh
+kubectl describe pvc test-pvc
+
+kubectl describe pv
+
+```
+
 
 Questions:
 * What happens if the node is lost?
 * What could you suggest to optimize this?
+
+```sh
+kubectl delete po nginx-pv
+kubectl delete pvc test-pvc
+```
 
 ## Capacity of the cluster
 
