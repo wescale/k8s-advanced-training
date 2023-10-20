@@ -62,14 +62,6 @@ After few minutes, the worker nodes must be visible as `ready` members of the cl
 kubectl get nodes
 ```
 
-To finish this step, copy the kubeconfig file to the bastion instance:
-
-```sh
-mkdir -p ~/.kube
-# test your cluster
-kubectl cluster-info
-```
-
 ## Labels your domain of failure / topology key
 
 Each node (control plane or data plane) is deployed in a given zone of the Google Cloud Platform.
