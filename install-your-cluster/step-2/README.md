@@ -63,7 +63,7 @@ spec:
         claimName: test-pvc
 EOF
 
-kubect get po nginx-pv -o wide
+kubectl get po nginx-pv -o wide
 
 ```
 

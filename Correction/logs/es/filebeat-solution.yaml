@@ -63,11 +63,7 @@ spec:
             hostPath:
               path: /var/log/kube-audit/audit-log.json
         tolerations:
-        - key: "node-role.kubernetes.io/controlplane"
-          value: "true"
-          operator: "Equal"
-          effect: "NoSchedule"
-        - key: "node-role.kubernetes.io/etcd"
+        - key: "CriticalAddonsOnly"
           value: "true"
           operator: "Equal"
           effect: "NoExecute"

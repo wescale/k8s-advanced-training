@@ -35,7 +35,7 @@ There are several key/value pairs under the data key. The key that interests us 
 - namespace is the Base64 encoding of the current namespace.
 - token is the Base64 encoding of the JWT used to authenticate against the API server.
 
-Let’s focus on the token and try to decode it: use command line base64(or https://www.base64decode.org/) and https://jwt.io. 
+Let’s focus on the token and try to decode it: use command line base64(or https://www.base64decode.org/) and https://jwt.io.
 Look on the payload:
 
 ```sh
@@ -64,9 +64,9 @@ Look on the payload:
 kubectl create token default -n wsc-kubernetes-training-sa --duration=1h
 ```
 
-How to use this default token from within a simple Pod: 
+How to use this default token from within a simple Pod:
 
-- Create a new Pod in your namespace 
+- Create a new Pod in your namespace
 
 ```sh
 apiVersion: v1
@@ -88,7 +88,7 @@ kubectl apply -n wsc-kubernetes-training-sa -f pod-default.yaml
 ```
 
 ```sh
-kubectl get po/pod-default -o yaml -n wsc-kubernetes-training-sa 
+kubectl get po/pod-default -o yaml -n wsc-kubernetes-training-sa
 
 result:
 (...)
@@ -125,7 +125,7 @@ $ kubectl exec -n wsc-kubernetes-training-sa -it pod-default -- sh
   "kind": "Status",
   "apiVersion": "v1",
   "metadata": {
-    
+
   },
   "status": "Failure",
   "message": "Unauthorized",
@@ -160,19 +160,19 @@ $ kubectl exec -n wsc-kubernetes-training-sa -it pod-default -- sh
 
 - Within your pod, try to you use this token to list all the Pods: https://kubernetes.default.svc/api/v1/default/pods
 and https://kubernetes.default.svc/api/v1/wsc-kubernetes-training-sa/pods
- 
+
  ```sh
 # curl -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/default/pods --insecure
 
  "message": "wsc-kubernetes-training-sa \"pods\" is forbidden: User \"system:serviceaccount:default:default\" cannot get resource \"wsc-kubernetes-training-sa\" in API group \"\" at the cluster scope",
- 
+
  # curl -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/wsc-kubernetes-training-sa/pods --insecure
 
   "message": "wsc-kubernetes-training-sa \"pods\" is forbidden: User \"system:serviceaccount:default:default\" cannot get resource \"wsc-kubernetes-training-sa\" in API group \"\" at the cluster scope",
 
  ```
 
- What do you notice ? > The default service account does not have enough rights to perform this query. 
+ What do you notice ? > The default service account does not have enough rights to perform this query.
  => We will create our own ServiceAccount and provide it with the additional rights it needs for this action.
 
 # Create a custom serviceaccount
@@ -186,7 +186,7 @@ serviceaccount/training-sa created
 
 - A ServiceAccount is not that useful unless certain rights are bound to it. Defines a Role allowing to list all the Pods in the your namespace.
 
-What kind of Role do you need ? Role o ClusterRole ?
+What kind of Role do you need ? Role or ClusterRole ?
 > Role because, I just need to list all Pods in my namespace and not in others namespaces.
 
 
@@ -204,7 +204,7 @@ $ kubectl apply -f training-role-binding-sa.yaml
 $ kubectl get rolebinding -n wsc-kubernetes-training-sa
  ```
 
- - Create a new pod in your namespace using the ServiceAccount within a Pod 
+- Create a new pod in your namespace using the ServiceAccount within a Pod
 
 ```sh
 apiVersion: v1
@@ -222,9 +222,9 @@ spec:
     - "10000"
  ```
 
- - Within your namespace, inside the new Pod, try to you use the token for your new sa to list all the Pods:  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods and 
+ - Within your namespace, inside the new Pod, try to you use the token for your new sa to list all the Pods:  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods and
  https://kubernetes.default.svc/api/v1/namespaces/default/pods
- 
+
  ```sh
  $ kubectl exec -n wsc-kubernetes-training-sa -it pod-sa -- sh
 # apk add --update curl
@@ -234,7 +234,7 @@ spec:
 # curl -H "Authorization: Bearer $TOKEN"  https://kubernetes.default.svc/api/v1/namespaces/default/pods --insecure
   ```
 What do you notice when you call the api namespaces/default/pods ?
-=> Yes got a reason Forbidden when call the api namespaces/default/pods 
+=> Yes got a reason Forbidden when call the api namespaces/default/pods
 
 What is the solution to solve this ?
 Creation of ClusterRole
