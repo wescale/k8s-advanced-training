@@ -3,11 +3,11 @@ kind: StatefulSet
 metadata:
   name: {{ include "simpleapp.fullname" . }}
   labels:
-    app.kubernetes.io/stack: 
+    app.kubernetes.io/stack:
       {{ include "simpleapp.fullname" . }}
     {{- include "simpleapp.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: {{ include "simpleapp.fullname" . }}

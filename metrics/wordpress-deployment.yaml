@@ -61,6 +61,8 @@ spec:
             secretKeyRef:
               name: mysql-pass
               key: password.txt
+        - name: WORDPRESS_DB_USER
+          value: root
         ports:
         - containerPort: 80
           name: wordpress
