@@ -1,4 +1,4 @@
-# exercise-2: Taints and tolerations
+# Taints and tolerations
 
 In this hands-on lab, you will get familiar with taints and tolerations.
 
@@ -8,7 +8,7 @@ Then, you will add taints to all the workers and see the effect.
 You will be responsible for splitting up the worker nodes and making:
 * one of the worker nodes a production (prod) environment node.
 * one of the worker nodes a development (dev) environment node.
-* ONLY if you have a three worker node cluster: one of the worker nodes a pre-production (iso) environment node.
+* one of the worker nodes a pre-production (iso) environment node.
 
 The purpose of identifying the production type is to not accidentally deploy pods into the production environment. You will use taints and tolerations to achieve this, and then you will deploy two pods: One pod will be scheduled to the dev environment, and one pod will be scheduled to the prod environment.
 
@@ -29,13 +29,9 @@ Ensure the pod is running and note the worker it is running on.
 ## For each worker node, apply a taint
 
 *DO not add taint to a MASTER node!*:
-```
+```sh
 kubectl taint node <NODE1_NAME> node-type=prod:NoExecute
 kubectl taint node <NODE2_NAME> node-type=dev:NoExecute
-```
-
-If your cluster has 3 worker nodes:
-```sh
 kubectl taint node <NODE3_NAME> node-type=iso:NoExecute
 ```
 
@@ -47,10 +43,10 @@ kubectl get nodes  -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints
 
 Is the no-toleration-pod still running ? Why?
 
-## Schedule a pod to the dev environment.
+## Schedule a pod to the dev environment
 
 Here is the pod spec:
-```
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -112,7 +108,7 @@ kubectl create -f prod-deployment.yml
 ```
 
 Verify each pod has been scheduled and verify the tolerations.
-```
+```sh
 kubectl get pods -o wide
 ```
 
@@ -122,13 +118,9 @@ Is the prod pod running ? Why ?
 
 Remove Taint on all the worker nodes.
 For that, use the `taint node` subcommand and add *-*- at the end of the taint name:
-```
+```sh
 kubectl taint node <NODE1_NAME> node-type-
 kubectl taint node <NODE2_NAME> node-type-
-```
-
-If your cluster has 3 worker nodes:
-```sh
 kubectl taint node <NODE3_NAME> node-type-
 ```
 

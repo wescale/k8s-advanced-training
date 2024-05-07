@@ -1,4 +1,4 @@
-# IngressController
+# Ingress Controller
 
 Nginx prods are deployed as a daemonSet -> 1 per node.
 
@@ -6,8 +6,8 @@ Where are the nginx pods running?:
 
 ```yaml
 kubectl get ns
-kubectl get all -n kube-system |grep ingress-nginx
-kubectl describe daemonset.apps/rke2-ingress-nginx-controller -n kube-system
+kubectl get all -n ingress-nginx
+kubectl describe ds -n ingress-nginx
 ```
 
 How is that achieved ?
@@ -62,7 +62,7 @@ To optimize this:
 
 ## for pods
 
-* Default value max number of pods per node: 
+* Default value max number of pods per node:
 ```sh
 kubectl get node worker-X -ojsonpath='{.status.capacity.pods}{"\n"}'
 ```

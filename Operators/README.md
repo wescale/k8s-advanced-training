@@ -10,13 +10,13 @@ Install the operator with helm
 ```sh
 helm repo add bitpoke https://helm-charts.bitpoke.io
 helm repo update
-helm install mysql-operator bitpoke/mysql-operator
+helm install mysql-operator bitpoke/mysql-operator -n mysql-operator --create-namespace
 ```
 
 Check the operator controller is deployed
 
 ```sh
-kubectl get pods
+kubectl get pods -n mysql-operator
 NAME               READY   STATUS    RESTARTS   AGE
 mysql-operator-0   2/2     Running   0          41s
 ```
@@ -25,11 +25,13 @@ The operator extended K8S api server with new api resources
 
 ```sh
 kubectl get crd | grep "mysql"
-mysqlbackups.mysql.presslabs.org            2020-11-24T15:26:31Z
-mysqlclusters.mysql.presslabs.org           2020-11-24T15:26:31Z
-...
+mysqlbackups.mysql.presslabs.org                      2024-05-07T13:04:49Z
+mysqlclusters.mysql.presslabs.org                     2024-05-07T13:04:49Z
+mysqldatabases.mysql.presslabs.org                    2024-05-07T13:04:49Z
+mysqlusers.mysql.presslabs.org                        2024-05-07T13:04:49Z
 ```
 The operator will listen to API requests on mysqlbackups and mysqlclusters to manage the mysql cluster
+
 ## Create a Mysql cluster
 
 First we will create a secret containing the root password
@@ -79,11 +81,10 @@ kubectl get pods -l role=replica
 ```
 
 ## Create a DB backup
+
 In order to save the backup we will deploy a minio s3 server
 ```sh
-helm repo add minio https://helm.min.io/
-helm repo update
-helm install minio --set accessKey=myaccesskey,secretKey=mysecretkey,resources.requests.memory=1G,defaultBucket.enabled=true,defaultBucket.name=mysql  minio/minio
+helm install minio -n minio oci://registry-1.docker.io/bitnamicharts/minio --create-namespace --set auth.rootUser=admin,auth.rootPassword=Wesc@leTrain1ng,defaultBuckets=mysql
 ```
 Then we create the secret to access minio server
 ```sh
@@ -102,17 +103,15 @@ kubectl describe mysqlbackup
 Verify in minio
 
 ```sh
-export POD_NAME=$(kubectl get pods --namespace default -l "release=minio" -o jsonpath="{.items[0].metadata.name}")
-kubectl port-forward --address 0.0.0.0 $POD_NAME 9000
+kubectl port-forward -n minio --address 0.0.0.0 svc/minio 9001
 ```
 
-URL: http://BASTION_URL:9000/minio/mysql/
+URL: http://BASTION_URL:9001
 
 Delete all the created resources:
 
 ```sh
 kubectl delete -f .
-helm uninstall minio
-helm uninstall mysql-operator
+helm uninstall minio -n minio
+helm uninstall mysql-operator -n mysql-operator
 ```
-

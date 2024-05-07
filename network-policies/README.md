@@ -8,9 +8,9 @@ A `wordpress` application is deployed into the namespace `application`:
   * 1 `wordpress` service
 * `MariaDB` database:
   * 1 statefulset
-  * 1 `wordpress-mariadb` service 
+  * 1 `wordpress-mariadb` service
 
-An `nginx` ingress controller running in a `kube-system` namespace.
+An `nginx` ingress controller running in a `ingress-nginx` namespace.
 
 Because the nginx ingress controller exposes ports 80 and 443 to the worker nodes, you can access the Wordpress from your web browser. **Ask the trainer to provide the URL.**
 
@@ -18,7 +18,7 @@ At the end of the exercise, you will have secured the stack: only the nginx prox
 
 # Step 1 - Deny all traffic
 
-Create network policies to deny all ingress traffic for namespaces `kube-system` and `application`.
+Create network policies to deny all ingress traffic for namespaces `ingress-nginx` and `application`.
 
 Ensure the application is not accessible from your web browser.
 # Step 2 - Allow traffic to the proxy

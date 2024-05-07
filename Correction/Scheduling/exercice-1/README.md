@@ -14,7 +14,7 @@ Pod node-affinity-pod-soft scheduled in another node. The node affinity is not a
 # Distribute replicas on failure domains
 Can you explain what happened?
 
-The 4th pod is not scheduled, because we have only 3 nodes and choose to distrubute replicas 
+The 4th pod is not scheduled, because we have only 3 nodes and choose to distrubute replicas
 
 What do you suggest as an improvement?
 

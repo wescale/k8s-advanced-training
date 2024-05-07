@@ -18,7 +18,7 @@ kubectl get pods -owide  -n scheduling
 
 Can you explain what happened ?
 
-## Pod Affinity/AntiAffinity 
+## Pod Affinity/AntiAffinity
 
 ### Coupled pods
 
@@ -35,7 +35,7 @@ kubectl get pods -l app=app0 -owide  -n scheduling
 kubectl get pods -l app=app1 -owide  -n scheduling
 ```
 
-Then we will deploy a pod which must be 
+Then we will deploy a pod which must be
 * close to the app0 pods - same node
 * far from the app1 pods - different node
 
@@ -140,11 +140,11 @@ What do you suggest as an improvement?
 
 What will happen if you get 10 replicas?
 
-## Pod Topology Constraint
+## BONUS: Pod Topology Constraint
 
 Finally, we want to mix topology spread and pod anti-affinity constraints.
 
-Update the deployment with topology constraints 
+Update the deployment with topology constraints
 
 ```sh
 apiVersion: apps/v1
@@ -168,7 +168,7 @@ spec:
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
             matchLabels:
-              app: #POD LABEL KEY USED TO DISTRIBUTE#      
+              app: #POD LABEL KEY USED TO DISTRIBUTE#
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -176,10 +176,10 @@ spec:
             podAffinityTerm:
               labelSelector:
                 matchExpressions:
-                - key: #POD LABEL KEY USED TO DISTRIBUTE#      
+                - key: #POD LABEL KEY USED TO DISTRIBUTE#
                   operator: In
                   values:
-                  - #POD LABEL VALUE USED TO DISTRIBUTE#      
+                  - #POD LABEL VALUE USED TO DISTRIBUTE#
               topologyKey: #NODE level DOMAIN KEY#
       containers:
       - name: pod-topology
