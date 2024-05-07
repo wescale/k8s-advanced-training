@@ -1,12 +1,12 @@
-## IngressController
+## Ingress Controller
 
-Inside the `kube-system` namespace, look at the resources related to `ingress-nginx`.
+Look at the resources located in the `ingress-nginx` namespace.
 
 Examine the DaemonSet to answer the following questions:
 
 * Where are the nginx pods running?
 * How is that achieved?
-* What are the ports they exposed?
+* What are the ports they expose?
 
 Ask your trainer to indicate the public DNS record for the `lb` and try to connect to the exposed Nginx.
 
@@ -67,10 +67,7 @@ kubectl get po nginx-pv -o wide
 
 ```
 
-You can connect to the kubernetes nodes `ssh -F provided_ssh_config worker-x` to see their file system and mount points.
-
-
-Back to bastion and explore PV and PVC
+Explore PV and PVC resources to get more information on the volume you created
 
 ```sh
 kubectl describe pvc test-pvc
@@ -78,6 +75,8 @@ kubectl describe pvc test-pvc
 kubectl describe pv
 
 ```
+
+You can connect to the kubernetes nodes `ssh -F provided_ssh_config worker-x` to see their file system and mount points.
 
 
 Questions:
@@ -102,6 +101,8 @@ ps -ef|grep kube-controller
 ## Networking
 
 On a master, inspect the `/etc/rancher/rke2/config.yaml` file to determine the network plugin used by the cluster.
+
+> Canal is a project that combines Flannel and Calico for CNI Networking. It uses Flannel for networking pod traffic between hosts via VXLAN and Calico for network policy enforcement and pod to pod traffic.
 
 Generally, a network plugin comes with Custom Resource Definition - CRDs to provide interactions for specific features. Those CRDs are additional Kubernetes objects.
 

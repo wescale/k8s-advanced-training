@@ -1,14 +1,17 @@
 apiVersion: beat.k8s.elastic.co/v1beta1
 kind: Beat
 metadata:
-  name: quickstart-masters
+  name: beat-masters
+  namespace: logs
 spec:
   type: filebeat
   version: 8.1.1
   elasticsearchRef:
-    name: quickstart
+    name: elasticsearch
+    namespace: logs
   kibanaRef:
-    name: quickstart
+    name: kibana
+    namespace: logs
   config:
     processors:
       - add_cloud_metadata: {}

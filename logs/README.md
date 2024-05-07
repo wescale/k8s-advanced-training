@@ -4,7 +4,7 @@ After installing a wordpress application, you deploy install [Elastic Cloud on K
 
 Using the CRDs, you will deploy a complete logging stack based on ElasticSearch, Kibana and Logs senders (Beats).
 
-## Install Wordpress app
+## Install Wordpress app (If you don't have any application installed)
 
 ```sh
 kubectl create ns wordpress
@@ -53,7 +53,7 @@ cat <<EOF | kubectl apply -n logs -f -
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
-  name: quickstart
+  name: elasticsearch
 spec:
   version: 8.6.2
   nodeSets:
@@ -71,7 +71,7 @@ Wait the instance becomes (unknown -> green):
 kubectl get elasticsearch -n logs -w
 ```
 
-Retrieve the password: `export PASSWORD=$(kubectl get secret quickstart-es-elastic-user -n logs -o go-template='{{.data.elastic | base64decode}}')`
+Retrieve the password: `export PASSWORD=$(kubectl get secret elasticsearch-es-elastic-user -n logs -o go-template='{{.data.elastic | base64decode}}')`
 
 ## Create a Kibana
 
@@ -81,17 +81,17 @@ cat <<EOF | kubectl apply -n logs -f -
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
-  name: quickstart
+  name: kibana
 spec:
   version: 8.6.2
   count: 1
   elasticsearchRef:
-    name: quickstart
+    name: elasticsearch
 EOF
 # Wait that the health becomes green (red -> green)
 kubectl get kibana -n logs -w
 # Port Forward
-kubectl port-forward service/quickstart-kb-http --address 0.0.0.0 -n logs 5601 &
+kubectl port-forward service/kibana-kb-http --address 0.0.0.0 -n logs 5601
 ```
 
 Now, you can open a browser on <https://bastion.k8s-ops-X.wescaletraining.fr:5601/login?next=%2F> (replace X with your cluster number) and enter the "elastic / ${PASSWORD}" credentials.

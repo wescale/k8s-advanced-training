@@ -1,12 +1,12 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: mysql-prom
+  name: mysql-exporter
   namespace: wordpress
 spec:
   selector:
     matchLabels:
-      app: wordpress
-      tier: mysql
+      app.kubernetes.io/instance: mysql-exporter
+      app.kubernetes.io/name: prometheus-mysql-exporter
   endpoints:
-  - port: mysqld-exporter
+  - port: mysql-exporter

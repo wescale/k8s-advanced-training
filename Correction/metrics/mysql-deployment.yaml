@@ -70,27 +70,6 @@ spec:
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
-      - image: prom/mysqld-exporter
-        name: prom-mysql
-        env:
-        - name: MYSQL_USER 
-          value: root
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-pass
-              key: password.txt
-        - name: MYSQL_HOST
-          value: localhost
-        - name: MYSQL_PORT
-          value: "3306"
-        - name: MYSQL_DB 
-          value: wordpress
-        - name: DATA_SOURCE_NAME
-          value: "$(MYSQL_USER):$(MYSQL_PASSWORD)@($(MYSQL_HOST):$(MYSQL_PORT))/$(MYSQL_DB)"
-        ports:
-        - containerPort: 9104
-          name: mysqld-exporter
       volumes:
       - name: mysql-persistent-storage
         persistentVolumeClaim:

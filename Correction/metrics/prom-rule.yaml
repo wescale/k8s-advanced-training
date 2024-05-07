@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: mysql-prom-up
+  name: mysql-exporter-up
   namespace: wordpress
 spec:
   groups:
@@ -11,7 +11,7 @@ spec:
           annotations:
             description: Targets are down.
             summary: Targets are down
-          expr: up{app="wordpress",tier="mysql", namespace="wordpress"} < 1
-          for: 10m
+          expr: up{job="mysql-exporter-prometheus-mysql-exporter"} < 1
+          for: 1m
           labels:
             severity: warning

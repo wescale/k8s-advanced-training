@@ -4,12 +4,12 @@ You will install the [kube-prometheus](https://github.com/prometheus-operator/ku
 
 In a second time, you will deploy a wordpress application then monitor it with Prometheus and Grafana. To achieve that, you will:
 
-* monitor mysql:
+* Monitor mysql:
   * add a `mysql-exporter`
   * create a ServiceMonitor
   * create a dashboard on Grafana to verify your PromQL
   * add a PrometheusRule to ensure you always have a mysql running.
-* monitor the wordpress webapp
+* Monitor the wordpress webapp
   * deploy a BlackBox exporter infrastructure
   * add a Probe resource to tell Prometheus it must monitor your wordpress via the BlackBox exporter infrastructure
 
@@ -64,12 +64,12 @@ Can you tell what the result means ?
 
 ### Alerts
 
-Navigate through th UI to see the Alerts.
+Navigate through the UI to see the Alerts.
 
 You see the list of community recommended alerts.
 Each alert has a meaning, an impact, a disgnosis and a mitigation that can be found on [https://runbooks.prometheus-operator.dev/](https://runbooks.prometheus-operator.dev/)
 
-Look at the currently `firing` alerts. Some are critical. Yet the cluster is functionnal. 
+Look at the currently `firing` alerts. Some are critical. Yet the cluster is functionnal.
 
 Why?
 
@@ -100,7 +100,7 @@ Kubernetes secret `mysql-pass` is referenced by the MySQL and WordPress pod conf
 Complete the following command to create the kubernetes secret `mysql-pass` from the given [password.txt](./password.txt) file.
 
 ```sh
-kubectl create secret generic mysql-pass -n wordpress COMPLETE_THE_COMMAND
+kubectl create secret generic mysql-pass -n wordpress <COMPLETE_THE_COMMAND>
 ```
 
 Now, the MySQL pods can be launched. Start MySQL using [mysql-deployment.yaml](./mysql-deployment.yaml).
@@ -116,7 +116,7 @@ Up to this point one Deployment, one Pod, one PVC, one Service, one Endpoint, on
 ```sh
 kubectl get deployment,pod,svc,endpoints,pvc -l app=wordpress -o wide -n wordpress && \
 kubectl get secret mysql-pass -n wordpress && \
-kubectl get pv -n wordpress 
+kubectl get pv -n wordpress
 ```
 
 #### Deploy WordPress
@@ -132,7 +132,7 @@ Ensure everything is fine with:
 ```sh
 kubectl get deployment,pod,svc,endpoints,pvc -l app=wordpress -o wide -n wordpress && \
 kubectl get secret mysql-pass -n wordpress && \
-kubectl get pv -n wordpress 
+kubectl get pv -n wordpress
 ```
 
 Now, we can visit the running WordPress app.
@@ -140,7 +140,7 @@ Now, we can visit the running WordPress app.
 Retrieve the opened Node port:
 
 ```sh
-kubectl get services wordpress -n wordpress 
+kubectl get services wordpress -n wordpress
 NAME        TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 wordpress   NodePort   10.43.21.217   <none>        80:31362/TCP   5m15s
 ```
@@ -153,34 +153,23 @@ You should see the familiar WordPress init page.
 
 #### Get MySQL metrics in Prometheus
 
-Edit the [mysql-deployment.yaml](./mysql-deployment.yaml) file to add a [prom/mysqld-exporter](https://registry.hub.docker.com/r/prom/mysqld-exporter/) sidecar to the `wordpress-mysql` deployment.
+To retrieve metrics from our mysql instance, we need to install a component called [mysql-exporter](https://github.com/prometheus/mysqld_exporter). It will connect to the MySQL database and retrieve monitoring metrics from it.
 
-You can use the following snippet to add a sidecar container to the mysql container:
-
-```yaml
-   spec:
-      containers:
-      - name: mysql
-        # Sidecar container
-      - name: prom-mysql
-        image: prom/mysqld-exporter
-        env:
-         # Configure the container to connect to the mysql container.
-         # Expected environment variable name is DATA_SOURCE_NAME
-         # You may use intermediary environment variables to build the value of DATA_SOURCE_NAME
-        ...
-        ports:
-        - containerPort: 9104
-          name: mysqld-exporter
-      volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-pv-claim
+Install the exporter using the associated chart:
+```sh
+helm install mysql-exporter prometheus-community/prometheus-mysql-exporter -n wordpress \
+  --set mysql.host="wordpress-mysql.wordpress.svc.cluster.local" \
+  --set mysql.user=root \
+  --set mysql.existingPasswordSecret.name=mysql-pass \
+  --set mysql.existingPasswordSecret.key=password.txt
 ```
 
-Ensure your pod starts without errors in the logs and your wordpress still works.
-
-Because the sidecar declares a new port, do not forget to add the `mysqld-exporter` to the service `wordpress-mysql` port list.
+You can look at what is exported by this component
+```sh
+kubectl -n wordpress port-forward svc/mysql-exporter-prometheus-mysql-exporter 9104
+# Query the metrics endpoint to see what is gathered by the exporter
+curl http://localhost:9104/metrics
+```
 
 Now, you must instruct Prometheus to scrape this exporter. To do that, create a [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitor) by completing this snippet:
 
@@ -188,19 +177,17 @@ Now, you must instruct Prometheus to scrape this exporter. To do that, create a 
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: mysql-prom
-  labels:
-    app: wordpress
-    tier: mysql
+  name: mysql-exporter
+  namespace: wordpress
 spec:
   selector:
     matchLabels:
-      LABELS_OF_THE_MYSQL_SERVICE
+      LABELS_OF_THE_MYSQL_EXPORTER_SERVICE
   endpoints:
-  - port: EXPORTER_PORT
+  - port: MYSQL_EXPORTER_PORT_NAME
 ```
 
-Wait 1 minute and ensure you see this target in the Prometheus /targets
+Wait 1 minute and ensure you see this target in the Prometheus /targets page
 
 #### Create a Grafana Dashboard for MySQL
 
@@ -216,7 +203,7 @@ Complete the given snippet to create a [PrometheusRule](https://github.com/prome
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: mysql-prom-up
+  name: mysql-exporter-up
   namespace: wordpress
 spec:
   groups:
@@ -306,11 +293,11 @@ spec:
   interval: 60s
   module: http_2xx
   prober:
-    url: BBOX_INTERNAL_SERVICE_DNS:BBOX_PORT
+    url: bbox-exporter-prometheus-blackbox-exporter.bbox-exporter.svc.cluster.local:9115
   targets:
     staticConfig:
       static:
-        - http://PUBLIC_DNS_OF_YOUR_CLUSTER:NODE_PORT_NUMBER/
+        - http://lb.k8s-ops-X.wescaletraining.fr:NODE_PORT_NUMBER/
 ```
 
 Create this probe.

@@ -2,7 +2,7 @@ In this exercise, you will instanciate an ArgoCD and get familiar with basics of
 
 ## Install ArgoCD
 
-Create an `argocd` namespace.
+Create an `argocd` namespace
 
 Then deploy ArgoCD:
 
@@ -18,7 +18,7 @@ Get the password of the `admin` user:
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
 
-Then run port-forward to reach the service of `argocd server` on the bastion instance on  port 8080.
+Then run port-forward to reach the service of `argocd server` on the bastion instance on port 8080.
 
 ```sh
 kubectl port-forward --address 0.0.0.0 -n argocd svc/SERVICE_NAME LOCALPORT:SERVICE_PORT
@@ -32,6 +32,7 @@ What is the default cluster URL?
 
 Inside the default project, create a new application named `ui-gitops-chart`.
 
+* Set project name as `default`
 * Enable `Auto create namespace`.
 * For the repository, indicate: `https://github.com/wescale/k8s-advanced-training.git`
 * Path: `GitOps-helm/sample-demo`
