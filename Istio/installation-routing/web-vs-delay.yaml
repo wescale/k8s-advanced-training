@@ -9,10 +9,9 @@ spec:
   - istio-system/http-gateway
   http:
   - fault:
-      delay:
-        fixedDelay: 7s
-        percentage:
-          value: 100
+      # To be completed for a 7s delay
+      # See https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPFaultInjection
+      ...
     match:
     - uri:
         prefix: "/nginx"

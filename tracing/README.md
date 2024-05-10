@@ -16,7 +16,7 @@ Install the Jaeger operator in cluster wide mode:
 
 ```sh
 kubectl create namespace observability
-kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.42.0/jaeger-operator.yaml -n observability
+kubectl create -f https://github.com/jaegertracing/jaeger-operator/releases/download/v1.57.0/jaeger-operator.yaml -n observability
 # Ensure everything is OK:
 kubectl get deployment jaeger-operator -n observability
 ```
@@ -40,6 +40,9 @@ metadata:
   name: simplest
 spec:
   strategy: allInOne
+  ingress:
+    enabled: true
+    ingressClassName: nginx
 ```
 
 ```sh
@@ -77,7 +80,7 @@ Edit the given [hot-rod.yml](./hotrod.yml) file to configure it:
           # The application directly call the collector. It needs to know the Jaeger collector endpoint
           # NOTE: the service is in the `tracing`namespace
           value: http://COLLECTOR_DNS:14268/api/traces
-```              
+```
 
 Deploy the application in the `default` namespace:
 
