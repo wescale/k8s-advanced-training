@@ -45,14 +45,10 @@ sudo certbot certonly --standalone --register-unsafely-without-email --preferred
 
 Launch a Keycloak server the generated certificate
 ```bash
-sudo docker run --name mykeycloak -p 443:8443 \
-  -e KC_HOSTNAME=bastion.k8s-ops-0.wescaletraining.fr \
-  -e BASTION_URL=$BASTION_URL \
-  -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=change_me \
+sudo docker run -d -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=password --name keycloak -p 443:443 \
   -v /etc/letsencrypt/live/$BASTION_URL/fullchain.pem:/etc/x509/https/tls.crt \
   -v /etc/letsencrypt/live/$BASTION_URL/privkey.pem:/etc/x509/https/tls.key \
-  quay.io/keycloak/keycloak:24.0.2 \
-  start --hostname-port=443 --https-certificate-file=/etc/x509/https/tls.crt --https-certificate-key-file=/etc/x509/https/tls.key
+  quay.io/keycloak:16.1.1 -Djboss.https.port=443
 ```
 
 Activate the oidc authentication plugin on the API servers. For that, add the following attributes to **ALL** the masters in the `/etc/rancher/rke2/config.yaml` file.
