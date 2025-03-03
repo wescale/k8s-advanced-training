@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: article-service
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: article-service
+spec:
+  type: ClusterIP
+  selector:
+    app: microservices-demo
+    component: article-service
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http

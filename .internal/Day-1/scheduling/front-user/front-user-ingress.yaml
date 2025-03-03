@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: front-user
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: front-user
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  rules:
+  - host: demo.k8s-ops-0.wescaletraining.fr
+    http:
+      paths:
+      - backend:
+          service:
+            name: front-user
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: article-service
+            port:
+              number: 8080
+        path: /article/
+        pathType: Prefix
+      - backend:
+          service:
+            name: cart-service
+            port:
+              number: 8080
+        path: /cart/
+        pathType: Prefix

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: mongodb
+spec:
+  selector:
+    app: microservices-demo
+    component: mongodb
+  ports:
+    - port: 27017

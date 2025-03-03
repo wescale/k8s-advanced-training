@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-cart-service-to-redis
+  namespace: application
+spec:
+  podSelector:
+    matchLabels:
+      app: microservices-demo
+      component: redis
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: microservices-demo
+          component: cart-service
+    ports:
+    - protocol: TCP
+      port: 6379

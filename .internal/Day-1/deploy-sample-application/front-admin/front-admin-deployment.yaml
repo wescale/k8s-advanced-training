@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-admin
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: front-admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservices-demo
+      component: front-admin
+  template:
+    metadata:
+      labels:
+        app: microservices-demo
+        component: front-admin
+    spec:
+      containers:
+        - name: front-admin
+          image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/front-admin:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources: {}
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/nginx/html/config
+      volumes:
+        - name: config
+          configMap:
+            name: front-admin

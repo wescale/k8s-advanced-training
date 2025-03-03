@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-user
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: front-user
+spec:
+  type: ClusterIP
+  selector:
+    app: microservices-demo
+    component: front-user
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http

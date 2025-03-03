@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: article-service
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: article-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservices-demo
+      component: article-service
+  template:
+    metadata:
+      labels:
+        app: microservices-demo
+        component: article-service
+    spec:
+      containers:
+        - name: article-service
+          image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/article-service:1.0.0
+          env:
+          - name: MONGODB_URI
+            value: mongodb://mongodb:27017/alpha-articles
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+          volumeMounts:
+          - name: config
+            mountPath: config.yaml
+            subPath: config.yaml
+      volumes:
+      - name: config
+        configMap:
+          name: article-service

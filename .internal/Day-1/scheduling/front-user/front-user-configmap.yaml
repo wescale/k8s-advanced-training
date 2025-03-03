@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: front-user
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: front-user
+data:
+  endpoints.json: |-
+    {
+      "apiArticlesEndpoint": "article",
+      "apiCartEndpoint": "cart"
+    }

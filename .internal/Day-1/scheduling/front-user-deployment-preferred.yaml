@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-user
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: front-user
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: microservices-demo
+      component: front-user
+  template:
+    metadata:
+      labels:
+        app: microservices-demo
+        component: front-user
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: component
+                  operator: In
+                  values:
+                  - front-user
+              topologyKey: topology.kubernetes.io/zone
+      containers:
+        - name: front-user
+          image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/front-user:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources: {}
+          volumeMounts:
+            - name: config
+              mountPath: /usr/share/nginx/html/config
+      volumes:
+        - name: config
+          configMap:
+            name: front-user

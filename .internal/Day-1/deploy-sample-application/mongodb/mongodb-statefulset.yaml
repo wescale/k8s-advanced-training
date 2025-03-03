@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservices-demo
+      component: mongodb
+  template:
+    metadata:
+      labels:
+        app: microservices-demo
+        component: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7.0.17
+        command:
+        - mongod
+        - --quiet
+        - --bind_ip
+        - "0.0.0.0"
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongodb-storage
+          mountPath: /data/db
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "300m"
+            memory: "128Mi"
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi

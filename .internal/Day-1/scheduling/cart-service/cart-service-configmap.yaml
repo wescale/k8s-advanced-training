@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cart-service
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: cart-service
+data:
+  config.yaml: |
+    listen: ":8080"

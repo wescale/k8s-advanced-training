@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservices-demo
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: microservices-demo
+        component: redis
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - worker-1.wescale.internal
+      containers:
+      - name: redis
+        image: redis:7.4.2-alpine
+        ports:
+        - containerPort: 6379

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-admin
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: front-admin
+spec:
+  type: ClusterIP
+  selector:
+    app: microservices-demo
+    component: front-admin
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http

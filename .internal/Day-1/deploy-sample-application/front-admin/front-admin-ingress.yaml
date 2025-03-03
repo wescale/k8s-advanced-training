@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: front-admin
+  namespace: application
+  labels:
+    app: microservices-demo
+    component: front-admin
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  rules:
+  - host: demo-admin.k8s-ops-0.wescaletraining.fr
+    http:
+      paths:
+      - backend:
+          service:
+            name: front-admin
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: article-service
+            port:
+              number: 8080
+        path: /article/
+        pathType: Prefix
