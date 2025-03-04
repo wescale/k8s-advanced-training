@@ -1,143 +1,106 @@
-This exercise aims to configure a ServiceAccount for Pods and accessing the API Server From a Pod
+# Access Kubernetes API with ServiceAccounts
 
-A lot of applications that run in the cluster (read: running in Pods), need to communicate with the API server.
-For example, some applications might need to know:
+Some applications that run in the cluster (read: running in pods) need to communicate with the API server.
 
-- The status of the cluster’s nodes.
-- The namespaces available.
-- The Pods running in the cluster, or in a specific namespace.
-...
+For example, applications might need to know:
 
-# Create a namespace and inspect default serviceaccount
+- The status of cluster nodes.
+- Some configuration specified in custom K8s objects
+- The list of existing namespaces
+- Pods running in the cluster, or in a specific namespace.
 
-- Create the namespace `wsc-kubernetes-training-sa`
-- Each namespace has a default ServiceAccount, named `default`. Can you verify this for your namespace ?
+This exercise aims to configure a ServiceAccount and accessing the API Server from inside a pod.
 
-```sh
-kubectl get sa --all-namespaces | grep default
- ```
+In case you need help during this exercise, you can refer to this [documentation](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).
 
-- Create a secret in the `wsc-kubernetes-training-sa` namespace with a token for the `default` service account
+## Inspect the default ServiceAccount
+
+Each namespace has a default ServiceAccount.
+
+- Verify this statement using the `kubectl get` command
+
+- Create a secret called `default-sa` in the `application` namespace to generate a long-lived API token for the `default` ServiceAccount
+
 ```sh
 apiVersion: v1
 kind: Secret
 metadata:
   name: default-sa
-  namespace: wsc-kubernetes-training-sa
+  namespace: application
   annotations:
     kubernetes.io/service-account.name: default
 type: kubernetes.io/service-account-token
 ```
 
-Look inside the secret to see its content.
+- Look inside the secret to see its content
+  - There are several key/value pairs under the data key. The key that interests us is token:
+    - `ca.crt` is the Base64 encoding of the cluster certificate.
+    - `namespace` is the Base64 encoding of the current namespace.
+    - `token` is the Base64 encoding of the JWT used to authenticate against the API server.
 
-There are several key/value pairs under the data key. The key that interests us is token:
+- Let’s focus on the token and try to decode it: use command line base64(or https://www.base64decode.org/) and https://jwt.io.
 
-- ca.crt is the Base64 encoding of the cluster certificate.
-- namespace is the Base64 encoding of the current namespace.
-- token is the Base64 encoding of the JWT used to authenticate against the API server.
+- Tak a look at the decoded payload:
 
-Let’s focus on the token and try to decode it: use command line base64(or https://www.base64decode.org/) and https://jwt.io. 
-Look on the payload:
-
-```sh
+```json
 {
-  "aud": [
-    "unknown"
-  ],
-  "exp": 1678723772,
-  "iat": 1678720172,
-  "iss": "rke",
-  "kubernetes.io": {
-    "namespace": "default",
-    "serviceaccount": {
-      "name": "default",
-      "uid": "736679dd-3cb1-4d94-9e67-db61db763ec3"
-    }
-  },
-  "nbf": 1678720172,
-  "sub": "system:serviceaccount:default:default"
+  "iss": "kubernetes/serviceaccount",
+  "kubernetes.io/serviceaccount/namespace": "application",
+  "kubernetes.io/serviceaccount/secret.name": "default-sa",
+  "kubernetes.io/serviceaccount/service-account.name": "default",
+  "kubernetes.io/serviceaccount/service-account.uid": "1798ba67-78e3-4cd7-9758-51fb5c7913d4",
+  "sub": "system:serviceaccount:application:default"
 }
  ```
 
+> Note that having a long-lived token can become a security issue in case it is leaked. Hence, it is a security best practice to generat short-lived token to reduce the exposure.
 
-**Note that it's a security best practice to generate short lived token with the following command**
-```sh
-kubectl create token default --duration=1h
-```
-
-How to use this default token from within a simple Pod: 
-
-- Create a new Pod in your namespace 
+- Create a short-lived token using the following command:
 
 ```sh
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pod-default
-  namespace: wsc-kubernetes-training-sa
-spec:
-  containers:
-  - name: alpine
-    image: alpine:3.9
-    command:
-      - "sleep"
-      - "10000"
+training@bastion:~$ kubectl create token default --duration=1h -n application
 ```
 
-- Verify that the same default sa is used 
+- Decode it again using the [jwt.io](https://jwt.io) website. Do you see a change compared to the long-lived token ?
 
-The serviceAccountName key is set with the name of the `default` ServiceAccount.
-The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of a projected volume, in the `/var/run/secrets/kubernetes.io/serviceaccount` folder.
+> As we have seen, the `default` ServiceAccount is used by default in pods when you don't specify a ServiceAccount explicitly
 
-You will request the API server from the pod. For that, use `wget` or `curl` (to install `curl`, run: `apk update && apk add curl`).
+- Inspect the `front-admin` pod the verify this statement
 
-- Try from the container to get information from the API server (endpoint: `https://kubernetes.default.svc/api/v1`) without authentication.
-  What do you notice ?
+> The `serviceAccountName` key is set with the name of the `default` ServiceAccount.
 
-- Try from the container to do the same call using the ServiceAccount token in the `Authorization: Bearer` HTTP header
+> The information of the ServiceAccount is mounted inside the container of the Pod, through the usage of a projected volume, in the `/var/run/secrets/kubernetes.io/serviceaccount` folder.
 
-- Try to you use this token to list all the Pods 
-  - inside the default namespace: https://kubernetes.default.svc/api/v1/namespaces/default/pods
-  - inside the current namespace: https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods
+You will now request the API server from the `front-admin` pod using the `curl` command.
 
-What do you notice ?
+- Exec in the container using the `kubectl exec -it` command and try to retrieve information from the API server at the `https://kubernetes.default.svc/api/v1` endpoint. What do you notice ?
 
-# Create a custom serviceaccount
+- Do the same call using the ServiceAccount token bound to the pod in the `Authorization: Bearer` HTTP header
 
-- Create a the service Account training-sa in your namespace
+- Try to you use this token to list all the Pods
+  - Inside the default namespace: `https://kubernetes.default.svc/api/v1/namespaces/default/pods`
+  - Inside the current namespace: `https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods`
 
-- A ServiceAccount is not that useful unless certain rights are bound to it. Defines a Role allowing to list all the Pods in the your namespace.
+- What do you notice ?
 
-What kind of Role do you need ? Role or ClusterRole ?
+## Create a custom ServiceAccount
 
-- Try to create the Role in your namespace with good rules and verify that it's created
+As said earlier this is not a best practice to use the `default` ServiceAccount if you intend to give it permissions since it is assigned by default to every pod in the namespace.
 
-- Try to bind the Role and the ServiceAccount created above
+We will now create a custom ServiceAccount instead and give it permissions to request the API server.
 
-- Create a new pod in your namespace using the ServiceAccount within a Pod 
+- Create a Servce Account called `training-sa` in the `application` namespace
 
-```sh
-apiVersion: v1
-kind: Pod
-metadata:
-  name: pod-sa
-  namespace: wsc-kubernetes-training-sa
-spec:
-  serviceAccountName: training-sa
-  containers:
-  - name: alpine
-    image: alpine:3.9
-    command:
-     - "sleep"
-     - "10000"
-```
+- A ServiceAccount is not that useful unless certain rights are bound to it. Define a Role allowing to list all the Pods in the `application` namespace. What kind of Role do you need ? Role or ClusterRole ?
 
-- Within your namespace, inside the new Pod, try to you use the token for your new sa to list all the Pods:  https://kubernetes.default.svc/api/v1/namespaces/wsc-kubernetes-training-sa/pods and 
- https://kubernetes.default.svc/api/v1/namespaces/default/pods
- 
-What do you notice when you call the api namespaces/default/pods ?
-What is the solution to solve this ?
+- Create the Role in the `application` namespace
 
-- Delete the namespace `wsc-kubernetes-training-sa`
+- Bind the Role you've just created and the ServiceAccount created above
 
+- Edit the `front-end` Deployment to specify the `training-sa` serviceAccount
+
+- Connect to the new `front-end` pod and try to list the pods using the ServiceAccount token:
+  - List pods in the `application` namespace: `https://kubernetes.default.svc/api/v1/namespaces/application/pods`
+  - List pods in the `default` namespace: `https://kubernetes.default.svc/api/v1/namespaces/default/pods`
+
+- What do you notice ? What is the solution to solve this ?

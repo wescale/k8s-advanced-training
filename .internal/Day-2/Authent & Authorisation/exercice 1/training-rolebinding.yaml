@@ -1,8 +1,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
- name: list-pods_demo-sa
- namespace: wsc-kubernetes-training-sa
+ name: training-sa-list-pods
+ namespace: application
 roleRef:
  kind: Role
  name: list-pods
@@ -10,4 +10,4 @@ roleRef:
 subjects:
  - kind: ServiceAccount
    name: training-sa
-   namespace: wsc-kubernetes-training-sa
+   namespace: application
