@@ -1,4 +1,6 @@
-This exercise aims to configure the cluster API server to use OpenIDConnect (OIDC) tokens for user authentication.
+# OIDC Connect authentication with Keycloak
+
+This demonstraton aims to configure the cluster API server to use OpenIDConnect (OIDC) tokens for user authentication.
 
 As indicated in the following schema, Kubernetes does not perform the OIDC authentication flow of the end-user.
 It just validates the given tokens and eventually refresh them if needed.
@@ -9,7 +11,7 @@ To demonstrate that, we are setting up a Keycloak instance as a docker container
 We are generating a custom certificate with certbot for SSL communication as it is needed by Kubernetes.
 Once OIDC authentication configured, we create a custom user on keycloak and demonstrate how to log on the Kubernetes cluster and how RBAC is mapped.
 
-# Install prerequisites
+## Install prerequisites
 
 ```bash
 sudo apt-get update
@@ -19,10 +21,7 @@ sudo apt-get install -y \
     gnupg \
     lsb-release \
     certbot
-```
 
-Install Docker :
-```bash
 sudo mkdir -m 0755 -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
@@ -37,58 +36,75 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 sudo usermod -aG docker training # Relaunch the ssh session
 ```
 
+## Deploy and configure Keycloak
+
 Generate the certificate for the Keycloak instance
+
 ```bash
 export BASTION_URL=bastion.k8s-ops-0.wescaletraining.fr
 sudo certbot certonly --standalone --register-unsafely-without-email --preferred-challenges http -d $BASTION_URL
 ```
 
 Launch a Keycloak server the generated certificate
+
 ```bash
-sudo docker run -d -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=password --name keycloak -p 443:443 \
+sudo docker run -d --name keycloak -p 443:443 \
+  -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+  -e KC_BOOTSTRAP_ADMIN_PASSWORD=password \
   -v /etc/letsencrypt/live/$BASTION_URL/fullchain.pem:/etc/x509/https/tls.crt \
   -v /etc/letsencrypt/live/$BASTION_URL/privkey.pem:/etc/x509/https/tls.key \
-  quay.io/keycloak/keycloak:16.1.1 -Djboss.https.port=443
+  quay.io/keycloak/keycloak:26.1 start --https-port=443 --hostname=$BASTION_URL \
+  --https-certificate-file=/etc/x509/https/tls.crt \
+  --https-certificate-key-file=/etc/x509/https/tls.key
 ```
 
-Activate the oidc authentication plugin on the API servers. For that, add the following attributes to **ALL** the masters in the `/etc/rancher/rke2/config.yaml` file.
-
-```yaml
-kube-apiserver-arg:
- - oidc-issuer-url=https://bastion.k8s-ops-0.wescaletraining.fr/auth/realms/master
- - oidc-client-id=kubernetes
- - oidc-groups-claim=groups
- - "oidc-groups-prefix=keycloak:"
- - oidc-username-claim=email
-```
-
-Then restart all the RKE2 server services: `systemctl restart rke2-server`.
+Connect to the Keycloak admin interface in a **private navigation window**
 
 Create a Keycloak client with the following information
+
 - id: `kubernetes`
 - protocol: `openid connect`
-- access type: `confidential`
+- client authentication: `on`
 - valid redirect uris
   - `http://localhost:18000` # for kubelogin
   - `http://localhost:8000` # for kubelogin
 - roles
   - create a new role `developer`
-- mapper
+- clients scopes => kubernetes-dedicated => mapper => user client role
   - name: `groups`
-  - type: `user client role`
   - client id: `kubernetes`
   - token claim name: `groups`
 
 Create a test user called john
+
 - users
-  - name: `john`
+  - username: `john`
     email: `john@wescaletraining.fr`
     email verified: `true`
     password: `Password1`
     role: `developer`
 
-Create a rolebinding for the developer Keycloak group
+## Configure Kubernetes
+
+Enable the oidc authentication plugin on the API servers. For that, add the following attributes to **ALL** the masters in the `/etc/kubernetes/manifests/kube-apiserver.yaml` file.
+
 ```yaml
+containers:
+- command:
+    ...
+    - --oidc-issuer-url=https://bastion.k8s-ops-0.wescaletraining.fr/realms/master
+    - --oidc-client-id=kubernetes
+    - --oidc-groups-claim=groups
+    - "--oidc-groups-prefix=keycloak:"
+    - --oidc-username-claim=email
+```
+
+Then wait for all API servers to restart: `crictl ps -a | grep kube-apiserver`.
+
+Create a rolebinding for the developer Keycloak group
+
+```sh
+cat <<'EOF' | kubectl apply -f -
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -101,12 +117,15 @@ roleRef:
   kind: ClusterRole
   name: view
   apiGroup: rbac.authorization.k8s.io
+EOF
 ```
 
-Retrieve the `creds/kube_config_cluster.yml` file on your laptop
+## Test connection with user john
+
+Retrieve the cluster kubeconfig file on your laptop
 ```bash
-scp -F provided_ssh_config bastion:/home/training/.kube/config kubeconfig
-export KUBECONFIG=kubeconfig
+scp -F provided_ssh_config bastion:/home/training/.kube/config /tmp/kubeconfig
+export KUBECONFIG=/tmp/kubeconfig
 ```
 
 Install kubectl plugin whoami
@@ -129,11 +148,11 @@ Retrieve the secret for the `kubernetes' Keycloak client on the credentials tab
 
 Setup kubectl OIDC login
 ```bash
+export BASTION_URL=bastion.k8s-ops-0.wescaletraining.fr
 kubectl oidc-login setup \
---oidc-issuer-url=https://$BASTION_URL/auth/realms/master \
+--oidc-issuer-url=https://$BASTION_URL/realms/master \
 --oidc-client-id=kubernetes \
---oidc-client-secret=<CLIENT_SECRET> \
---insecure-skip-tls-verify
+--oidc-client-secret=<CLIENT_SECRET>s
 ```
 
 Login as john@wescaletraining.fr
