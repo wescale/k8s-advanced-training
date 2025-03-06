@@ -1,0 +1,26 @@
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: #SET VALUE HERE#
+  namespace: application
+spec:
+  members: #SET VALUE HERE#
+  type: ReplicaSet
+  version: #SET VALUE HERE#
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: #SET VALUE HERE#
+      db: admin
+      passwordSecretRef:
+        name: #SET VALUE HERE#
+      roles:
+        - name: clusterAdmin
+          db: admin
+        - name: userAdminAnyDatabase
+          db: admin
+      scramCredentialsSecretName: scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib

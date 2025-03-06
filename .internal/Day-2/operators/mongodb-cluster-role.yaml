@@ -1,0 +1,28 @@
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: mongodb-cluster
+  namespace: application
+spec:
+  members: 3
+  type: ReplicaSet
+  version: 7.0.17
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: training
+      db: admin
+      passwordSecretRef:
+        name: mongodb-training-password
+      roles:
+        - name: clusterAdmin
+          db: admin
+        - name: userAdminAnyDatabase
+          db: admin
+        - name: dbOwner
+          db: article-alpha
+      scramCredentialsSecretName: scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: microservices-demo
+    component: article-service
+  name: article-service
+  namespace: application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservices-demo
+      component: article-service
+  template:
+    metadata:
+      labels:
+        app: microservices-demo
+        component: article-service
+    spec:
+      containers:
+      - env:
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              key: connectionString.standard
+              name: mongodb-cluster-admin-training
+        image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/article-service:1.0.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: article-service
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        volumeMounts:
+        - mountPath: config.yaml
+          name: config
+          subPath: config.yaml
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: article-service
+        name: config
