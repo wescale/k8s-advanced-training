@@ -77,8 +77,8 @@ training@bastion:~$ kubectl patch storageclass local-path -p '{"metadata": {"ann
 * Inspect the config maps of the related namespace, to determine where this StorageClass will create the persistent volumes.
 
 ```sh
-kubectl get ns
-kubectl describe cm local-path-config -n local-path-storage
+training@bastion:~$ kubectl get ns
+training@bastion:~$ kubectl describe cm local-path-config -n local-path-storage
 # Persistent volumes will be created in `/opt/local-path-provisioner`
 ```
 

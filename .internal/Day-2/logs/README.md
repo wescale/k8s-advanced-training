@@ -1,171 +1,129 @@
 # Logs with Elastic Cloud on Kubernetes - ECK
 
-After installing a wordpress application, you deploy install [Elastic Cloud on Kubernetes](https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-overview.html), an operator for the Elastic Search stack.
+In this exercise, we will see how to deploy a logging stack and how to configure it to collect logs from a Kubernetes cluster.
 
-Using the CRDs, you will deploy a complete logging stack based on ElasticSearch, Kibana and Logs senders (Beats).
+To demonstrate that, you will install the ElasticStack through the [ECK operator](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-overview.html).
 
-## Install Wordpress app
+## Install ECK operator
+
+- Install the ECK operator using the associated Helm chart
 
 ```sh
-kubectl create ns wordpress
-kubectl create secret generic mysql-pass -n wordpress --from-file=password.txt
-kubectl apply -f mysql-deployment.yaml
-kubectl apply -f wordpress-deployment.yaml
+training@bastion:~$ helm repo add elastic https://helm.elastic.co
+training@bastion:~$ helm install elastic-operator elastic/eck-operator -n elastic-system --create-namespace
 ```
 
-Check all the pods and resources are OK:
+- Look at the CRDs that have been created
 
 ```sh
-kubectl get deployment,pod,svc,endpoints,pvc -l app=wordpress -o wide -n wordpress && \
-kubectl get secret mysql-pass -n wordpress && \
-kubectl get pv -n wordpress
-```
-
-## Install ECK
-
-You will install a cluster wide ECK with an Helm chart:
-
-```sh
-helm repo add elastic https://helm.elastic.co
-helm repo update
-helm install elastic-operator elastic/eck-operator -n elastic-system --create-namespace
-```
-
----
-
-NOTE: you can install ECK in a [more restricted way](https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-install-helm.html#k8s-install-helm-restricted)
-
-See the CRDs that have been created:
-
-```sh
-kubectl api-resources|grep elastic
+training@bastion:~$ kubectl api-resources | grep elastic
 ```
 
 In particular, note the `ElasticSearch`, `Kibana` and `Beat` that will automate the deployment of the well known related components.
 
 ## Create an ElasticSearch instance
 
-Deploy an ElasticSearch instance for demo (single node, no virtual memory):
+- Deploy an ElasticSearch instance in a new `logging` namespace
 
 ```sh
-kubectl create ns logs
-cat <<EOF | kubectl apply -n logs -f -
+training@bastion:~$ kubectl create ns logging
+training@bastion:~$ cat <<EOF | kubectl apply -f -
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
   name: elasticsearch
+  namespace: logging
 spec:
-  version: 8.6.2
+  version: 8.17.3
   nodeSets:
   - name: default
     count: 1
     config:
-      # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-virtual-memory.html
       node.store.allow_mmap: false
 EOF
 ```
 
-Wait the instance becomes (unknown -> green):
+- Wait until the ES instance becomes green:
 
 ```sh
-kubectl get elasticsearch -n logs -w
+training@bastion:~$ watch kubectl get elasticsearch -n logging
 ```
 
-Retrieve the password: `export PASSWORD=$(kubectl get secret elasticsearch-es-elastic-user -n logs -o go-template='{{.data.elastic | base64decode}}')`
-
-## Create a Kibana
+- Retrieve user credentials in the `elasticsearch-es-elastic-user` secret
 
 ```sh
-# Deploy Kibana
-cat <<EOF | kubectl apply -n logs -f -
-apiVersion: kibana.k8s.elastic.co/v1
-kind: Kibana
-metadata:
-  name: kibana
-spec:
-  version: 8.6.2
-  count: 1
-  elasticsearchRef:
-    name: elasticsearch
-EOF
-# Wait that the health becomes green (red -> green)
-kubectl get kibana -n logs -w
-# Port Forward
-kubectl port-forward service/kibana-kb-http --address 0.0.0.0 -n logs 5601
+training@bastion:~$ kubectl get secret elasticsearch-es-elastic-user -n logging -o json | jq -r '.data.elastic' | base64 -d
 ```
 
-Now, you can open a browser on <https://bastion.k8s-ops-X.wescaletraining.fr:5601/login?next=%2F> (replace X with your cluster number) and enter the "elastic / ${PASSWORD}" credentials.
+## Deploy the Kibana interface
 
-Click 'Explore on my own'... but as you can see, there is no data because no sender is configured.
+```sh
+training@bastion:~$ kubectl apply -f kibana.yaml -n logging
 
-## Deploy a Filebeat
+# Wait until Kibana status becomes green
+training@bastion:~$ watch kubectl get kibana kibana -n logging
+```
+
+- Now you can open a browser on the `kibana.k8s-ops-X.wescaletraining.fr` address and authenticate using the credentials you retrieved earlier. Click **Explore on my own**... but as you can see, there is no data because we have not deployed a log collector yet.
+
+## Deploy a Filebeat log collector
 
 In the ElasticSearch world, the senders are `Beats`.
 
-Several [`Beat`](https://www.elastic.co/beats/) exist: file, audit, journal, heartbeat, ...
+There are different types of [`Beats`](https://www.elastic.co/beats/) (file, audit, journal, heartbeat, ...etc) each having its own purpose.
 
 Here, we want to collect container and pods logs from files on the nodes.
 
 We use a `processor` to enrich the log metadata with some kubernetes information.
-For that, the Filebeat we want to deploy needs a service account with non default privileges.
+For that, the filebeat we want to deploy needs a service account with non default privileges.
 
-Create specific Service account, cluster role and cluster role bindig:
-
-```sh
-# RBAC for Filebeat to add k8S metadata
-kubectl apply -f es/filebeat-rbac.yaml
-```
-
-Look at the [Filebeat definition](es/filebeat.yaml).
-
-Then create it:
+- Create a ServiceAccount for filebeat and give it cluster-scoped permissions:
 
 ```sh
-kubectl apply -f es/filebeat.yaml -n logs
-# Ensure the create beat becomes green. If not, inspect pod logs
-kubectl get beat -n logs
+training@bastion:~$ kubectl apply -f filebeat-rbac.yaml
 ```
 
-## Test the log aggregation
+- Inspect the [filebeat definition](filebeat.yaml) and deploy it in the `logging` namespace
 
-Generate some traffic on the wordpress application.
+```sh
+training@bastion:~$ kubectl apply -f filebeat.yaml -n logging
+```
 
-Go to [https://bastion.k8s-ops-X.wescaletraining.fr:5601/app/discover#/](https://bastion.k8s-ops-X.wescaletraining.fr:5601/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-15m,to:now))&_a=(columns:!(),filters:!(),index:'filebeat-*',interval:auto,query:(language:kuery,query:'kubernetes.namespace%20:%20wordpress'),sort:!(!('@timestamp',desc)))) and filter on `kubernetes.namespace : wordpress`, you should see logs within 5 minutes.
+- Wait until filebeat status becomes green and inspect its logs
 
-Select a log record and expand it by clicking on the double array.
+```sh
+training@bastion:~$ watch kubectl get beat filebeat -n logging
+```
+
+## Test logs collection
+
+Now we are going to test our setup to see if we can explore our logs on Kibana.
+
+- First, generate some traffic on the admin UI.
+
+- Then go to [https://kibana.k8s-ops-X.wescaletraining.fr/app/discover](https://kibana.k8s-ops-X.wescaletraining.fr/app/discover) and filter on `kubernetes.namespace: application`, you should see logs within 5 minutes.
+
+- Select a log record and expand it by clicking on the double array.
 
 You can retrieve interesting information thanks to the metadata enrichment:
 
-* Data collected by the Beat agent: `cloud.machine.type`, `cloud.project.id`, `container.image.name`, ...
-* Data collected from Kubernetes API server: `kubernetes.labels`, `kubernetes.pod.name`, ...
+- Data collected by the Beat agent: `cloud.machine.type`, `cloud.project.id`, `container.image.name`, ...
+- Data collected from Kubernetes API server: `kubernetes.labels`, `kubernetes.pod.name`, ...
 
 And finally, the `message` which is the original log message.
 
 ## Collect logs from the masters
 
-We want logs from the masters!
+As you probably noticed, the filebeat pods are only scheduled on the workers for now. This means that we are not collecting logs from the controlplane which is not good !
 
-You have probably noticed the Filbeat pods are only on the workers.
+- Inspect the current pods to see what kind of resource owns them
 
-Yet, they are deployed by a daemonset...
-
-Modify the Filebeat definition to deploy pods also on the master nodes.
-
-Once updated, ensure you see 6 available / expected pods for `kubectl get beat -n logs`.
-
-**`kubectl apply -f es/filebeat-solution.yaml -n logs`**
-
-Wait few minutes, and should see log entries for the query `agent.hostname: master-*`
-
-### Clean
+- Modify the filebeat definition to allow pods to be deployed on the master nodes
 
 ```sh
-kubectl delete ns wordpress
-kubectl delete ns logs
-helm uninstall elastic-operator -n elastic-system
-kubectl delete ns elastic-system
-
-for CRD in $(kubectl get crds --no-headers -o custom-columns=NAME:.metadata.name | grep k8s.elastic.co); do
-    kubectl delete crd "$CRD"
-done
+training@bastion:~$ kubectl apply -f filebeat-with-masters.yaml -n logging
 ```
+
+- Once updated, ensure you see 6 filebeat pods
+
+- Wait few minutes, and should see log entries on Kibana for the query `agent.hostname: master-*`

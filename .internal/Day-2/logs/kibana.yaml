@@ -1,0 +1,34 @@
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: kibana
+  namespace: logging
+spec:
+  version: 8.17.3
+  count: 1
+  elasticsearchRef:
+    name: elasticsearch
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  name: kibana
+  namespace: logging
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kibana.k8s-ops-X.wescaletraining.fr
+    http:
+      paths:
+      - backend:
+          service:
+            name: kibana-kb-http
+            port:
+              number: 5601
+        path: /
+        pathType: Prefix
