@@ -14,6 +14,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
     nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -32,3 +33,7 @@ spec:
               number: 5601
         path: /
         pathType: Prefix
+  tls:
+  - hosts:
+    - kibana.k8s-ops-X.wescaletraining.fr
+    secretName: kibana-tls

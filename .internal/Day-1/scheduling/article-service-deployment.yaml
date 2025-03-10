@@ -41,7 +41,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: article-service
-          image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/article-service:1.0.0
+          image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/article-service:2.0.2
           env:
           - name: MONGODB_URI
             value: mongodb://mongodb:27017/alpha-articles

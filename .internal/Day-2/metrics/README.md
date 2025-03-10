@@ -1,340 +1,239 @@
 # Metrics and alerting with kube-prometheus
 
-You will install the [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus) monitoring stack and experience how it works.
+To ensure the applications are running correctly and that the cluster is healthy we need to monitor what is deployed on the cluster. To do that, we need a metrics backend that can collect, store and present this data to cluster admin and users.
 
-In a second time, you will deploy a wordpress application then monitor it with Prometheus and Grafana. To achieve that, you will
+In this exercise, we will demonstrate that using the [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus) monitoring stack and experience how it works.
 
-* monitor mysql:
-  * add a `mysql-exporter`
-  * create a ServiceMonitor
-  * create a dashboard on Grafana to verify your PromQL
-  * add a PrometheusRule to ensure you always have a mysql running.
-* monitor the wordpress webapp
-  * deploy a BlackBox infrastructure
-  * add a BlackBoxExporter resources to telleto getXXX
+The goal will be to monitor our MongoDB cluster using the Prometheus configuration properties in the MongoDB operator as well as the performance of our admin UI using the [Blackbox exporter](https://github.com/prometheus/blackbox_exporter).
 
-## Install
+## Install kube-prometheus stack
 
-Create a `monitoring` namespace
+First, we are going to deploy the kube-prometheus stack using its Helm chart. To give context to the Helm release you have the `~/files/prometheus-chart-values.yaml` values file at your disposal.
 
-Install the kube-prometheus stack using Helm. Use the `/tmp/prometheus-chart-values.yaml` values file for the instantiation
+- Inspect the values file and install the kube-prometheus stack using Helm in a new `monitoring` namespace.
 
 ```sh
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n monitoring -f /tmp/prometheus-chart-values.yaml
+# Inspect Values file
+training@bastion:~$ cat ~/files/prometheus-chart-values.yaml
+# Install kube-prometheus stack
+training@bastion:~$ helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+training@bastion:~$ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  -f ~/files/prometheus-chart-values.yaml -n monitoring --create-namespace
 ```
 
-## kube-prometheus CRDs
+- Look at the pods that have been created and see the installed CRDs belonging to the `monitoring.coreos.com` API group
 
-See the installed CRDs running `kubectl api-resources --api-group=monitoring.coreos.com`.
+```sh
+training@bastion:~$ kubectl api-resources --api-group=monitoring.coreos.com
+```
 
-Among those CRDs, a `Prometheus` kind is now available on the cluster. The Helm release you have installed has created a `Prometheus` resource named `kube-prometheus-stack-prometheus`.
+> Among those CRDs, a `Prometheus` kind is now available on the cluster. The Helm release you have installed has created a `Prometheus` resource named `kube-prometheus-stack-prometheus`.
+
+```sh
+training@bastion:~$ kubectl describe prometheus -n monitoring
+```
 
 Regarding this resource, answer the following questions:
 
-* Is the resource highly available ? **`kubectl describe prometheus/kube-prometheus-stack-prometheus -n monitoring` -> No, 1 replicas**
-* Are there selectors on the Probes, ServiceMonitors, PodMonitors and Rules ? **No. This is a special setup to allow current kube-prometheus-stack-prometheus to watch all Probes, ServiceMonitors, PodMonitors and Rules without labels or namespace filtering**
+- Is the resource highly available?
 
-Using selectors allows to get several `Prometheus` instances each being isolated from others.
+> No, we only have one replica
+
+- At which frequency will metrics be scraped ?
+
+> Scrape interval is set to 30 seconds
+
+- How long are metrics stored ?
+
+> Retention is set to 3 hours
 
 ## Play with Prometheus
 
-Check that you can access prometheus (replace the X by value of your assigned project): <http://prometheus.k8s-ops-X.wescaletraining.fr/>
+- Check that you can access prometheus (replace the X by value of your assigned project): <http://prometheus.k8s-ops-X.wescaletraining.fr/>
 
-Navigate through the UI and check what's in the **Targets** tab.
+- Navigate through the UI and check what's in the **Status -> Target health** tab. Can you explain what each section corresponds to ?
 
-Can you explain what each section corresponds to ?
+> These are the different components that are currently being monitored by Prometheus. Each group usually corresponds to one application.
 
-Go back to the **Graph** tab and enter the following query
+- Go back to the **Query** tab and enter the following query
 
 ```sh
 up
 ```
 
-Can you tell what the result means ?
+- Can you tell what the result means ?
+
+> This request show the current status of every Prometheus target
 
 ### PromQL queries
 
-1. Using the `kube_pod_info` metric, retrieve the information of the `prometheus-kube-prometheus-stack-prometheus-0` pod on the `monitoring` namespace (tip: you might have to use some filters to facilitate your search). You can use this [documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/) to help you. **kube_pod_info{namespace="monitoring", pod="prometheus-kube-prometheus-stack-prometheus-0"}**
+You will now try out the PromQL querying language to retrieve some specific information. You can use this [documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/) to help you.
 
-2. Find the number of pods that have containers that asks for memory limit over 200MB across the whole cluster. **count(kube_pod_container_resource_limits > 209715200)**
+1. Using the `kube_pod_info` metric, retrieve the information of the `prometheus-kube-prometheus-stack-prometheus-0` pod on the `monitoring` namespace (*tip: you might have to use some filters to facilitate your search*).
 
-3. Display the sum of pods requested CPU per node **sum by(node) (kube_pod_container_resource_requests{resource="cpu"})**
+`kube_pod_info{namespace="monitoring", pod="prometheus-kube-prometheus-stack-prometheus-0"}`
+
+2. Find the number of pods that have containers that asks for memory limit over 200MB across the whole cluster
+
+`count(kube_pod_container_resource_limits > 200*1024*1024)`
+
+3. Display the sum of pods requested CPU per node
+
+`sum by(node) (kube_pod_container_resource_requests{resource="cpu"})`
 
 ### Alerts
 
-Navigate through th UI to see the Alerts.
+- Navigate through the Prometheus UI to see the Alerts.
 
-You see the list of community recommended alerts.
-Each alert has a meaning, an impact, a disgnosis and a mitigation that can be found on [https://runbooks.prometheus-operator.dev/](https://runbooks.prometheus-operator.dev/)
+> You see the list of community recommended alerts. Each alert has a meaning, an impact, a diagnosis and a mitigation that can be found on [https://runbooks.prometheus-operator.dev/](https://runbooks.prometheus-operator.dev/)
 
-Look at the currently `firing` alerts. Some are critical. Yet the cluster is functionnal. Why?
-**RKE1 does not deploy ControllerManager, kube-proxy and kube-scheduler as pods.**
+- Look at the alerts that are currently `firing`. Some are critical yet the cluster is functionnal. Can you guess why the `TargetDown` rules fires ?
+
+> Some core components (controller-manager, etcd, kube-proxy, schedulr) do not listen on the node IP adress but only on localhost. That is why the probe gets a **Connection Refused** error.
 
 ## Play with Grafana
 
-Check that you can access Grafana(replace the X by value of your assigned project): <http://grafana.k8s-ops-X.wescaletraining.fr/>
+- Check that you can access Grafana (replace the X by value of your assigned project): <http://grafana.k8s-ops-X.wescaletraining.fr/>
 
-To get the credentials, you have to look inside the `kube-prometheus-stack-grafana` secret in the monitoring namespace
-
-When connected, look for the `Kubernetes / Compute Resources / Cluster` dashboard which gives an overview of the resource usage of the cluster, can you find out the meaning of each panel ?
-
-Browse the other dashboards and try to guess what they are used for.
-
-You can also import other dashboards if you want. Take a look at the Grafana website to see what already exists : <https://grafana.com/grafana/dashboards/>
-
-## Monitor a wordpress application
-
-Create a `wordpress` namespace.
-
-All the resource creations for wordpress will be done in this `wordpress` namespace.
-
-### Deploy the wordpress application
-
-#### Deploy MySQL
-
-Kubernetes secret `mysql-pass` is referenced by the MySQL and WordPress pod configuration so that those pods will have access to it. The MySQL pod will set the database password, and the WordPress pod will use the password to access the database.
-
-Complete the following command to create the kubernetes secret `mysql-pass` from the given [password.txt](./password.txt) file.
+- To get the credentials, you have to look inside the `kube-prometheus-stack-grafana` secret in the `monitoring` namespace
 
 ```sh
-kubectl create secret generic mysql-pass -n wordpress COMPLETE_THE_COMMAND
+# Username
+training@bastion:~$ kubectl get secret -n monitoring kube-prometheus-stack-grafana -o json | jq -r '.data["admin-user"]' | base64 -d
+# Password
+training@bastion:~$ kubectl get secret -n monitoring kube-prometheus-stack-grafana -o json | jq -r '.data["admin-password"]' | base64 -d
 ```
 
-**`kubectl create secret generic mysql-pass -n wordpress --from-file=password.txt`**
+- When connected, look for the `Kubernetes / Compute Resources / Cluster` dashboard which gives an overview of the resource usage of the cluster, can you find out the meaning of each panel ?
 
-Now, the MySQL pods can be launched. Start MySQL using [mysql-deployment.yaml](./mysql-deployment.yaml).
+- Browse the other dashboards and try to guess what they are used for.
 
-Take a look at [mysql-deployment.yaml](./mysql-deployment.yaml), and note that we've defined a volume mount for /var/lib/mysql, and then created a Persistent Volume Claim that looks for a 2G volume. This claim is satisfied by any volume that meets the requirements.
+- You can also import other dashboards if you want. Take a look at the Grafana website to see what already exists: [https://grafana.com/grafana/dashboards/](https://grafana.com/grafana/dashboards/)
 
-Also look at the env section and see that we specified the password by referencing the secret mysql-pass that we created above. Secrets can have multiple key:value pairs. Ours has only one key password.txt which was the name of the file we used to create the secret. The MySQL image sets the database password using the MYSQL_ROOT_PASSWORD environment variable.
+## Monitor our microservices demo app
 
-It may take a short period before the new pod reaches the Running state.
+### MongoDB
 
-Up to this point one Deployment, one Pod, one PVC, one Service, one Endpoint, one PV, and one Secret have been created, as shown below:
+As said in the beginning, we will configure the MongoDB monitoring directy with the operator. Let's do it !
+
+- Create a secret containing credentials for the MongoDB user that will be in charge of querying metrics
 
 ```sh
-kubectl get deployment,pod,svc,endpoints,pvc -l app=wordpress -o wide -n wordpress && \
-kubectl get secret mysql-pass -n wordpress && \
-kubectl get pv -n wordpress
+training@bastion:~$ kubectl create secret generic mongodb-metrics-credentials -n application \
+  --from-literal username=prometheus --from-literal password=password
 ```
 
-#### Deploy WordPress
-
-Use [wordpress-deployment.yaml](./wordpress-deployment.yaml).
-
-Here we are using many of the same features, such as a volume claim for persistent storage and a secret for the password.
-
-The WordPress image accepts the database hostname through the environment variable WORDPRESS_DB_HOST. We set the env value to the name of the MySQL service we created: wordpress-mysql.
-
-Ensure everything is fine with
+- Edit your `MongoDBCommunity` cluster to expose Prometheus metrics on a custom endpoint
 
 ```sh
-kubectl get deployment,pod,svc,endpoints,pvc -l app=wordpress -o wide -n wordpress && \
-kubectl get secret mysql-pass -n wordpress && \
-kubectl get pv -n wordpress
-```
-
-Now, we can visit the running WordPress app.
-
-Retrieve the opened Node port:
-
-```sh
-kubectl get services wordpress -n wordpress
-NAME        TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
-wordpress   NodePort   10.43.21.217   <none>        80:31362/TCP   5m15s
-```
-
-<http://lb.k8s-ops-X.wescaletraining.fr:NODE_PORT>
-
-You should see the familiar WordPress init page.
-
-### Monitor MySQL
-
-#### Get MySQL metrics in Prometheus
-
-To retrieve metrics from our mysql instance, we need to install a component called [mysql-exporter](https://github.com/prometheus/mysqld_exporter). It will connect to the MySQL database and retrieve monitoring metrics from it.
-
-Install the exporter using the associated chart:
-```sh
-helm install mysql-exporter prometheus-community/prometheus-mysql-exporter -n wordpress \
-  --set mysql.host="wordpress-mysql.wordpress.svc.cluster.local" \
-  --set mysql.user=root \
-  --set mysql.existingPasswordSecret.name=mysql-pass \
-  --set mysql.existingPasswordSecret.key=password.txt
-```
-
-You can look at what is exported by this component
-```sh
-kubectl -n wordpress port-forward svc/mysql-exporter-prometheus-mysql-exporter 9104
-# Query the metrics endpoint to see what is gathered by the exporter
-curl http://localhost:9104/metrics
-```
-
-Now, you must instruct Prometheus to scrape this exporter. To do that, create a [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitor) by completing this snippet:
-
-```yaml
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: mysql-exporter
-  namespace: wordpress
+...
 spec:
-  selector:
-    matchLabels:
-      LABELS_OF_THE_MYSQL_EXPORTER_SERVICE
-  endpoints:
-  - port: MYSQL_EXPORTER_PORT_NAME
+  ...
+  prometheus:
+    username: prometheus
+    passwordSecretRef:
+      name: mongodb-metrics-credentials
+  ...
 ```
-
-Wait 1 minute and ensure you see this target in the Prometheus /targets page
-
-#### Create a Grafana Dashboard for MySQL
-
-On grafana, click on the **Dashboards** / **Import** menu and add  Grafana [dashboard](https://grafana.com/grafana/dashboards/14057-mysql/).
-
-Ensure it works well.
-
-#### Create an alert for MySQL pod
-
-Complete the given snippet to create a [PrometheusRule](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheusrule), to ensure you have at least one MySQL running for our wordpress application.
-
-```yaml
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: mysql-prom-up
-  namespace: wordpress
-spec:
-  groups:
-    - name: wordpress.mysql
-      rules:
-        - alert: NoRunningMysql
-          annotations:
-            description: Targets are down.
-            summary: Targets are down
-          # Hint: use the `up` metric
-          expr: PROM_QL_QUERY_TO_BE_COMPLETED
-          for: 10m
-          labels:
-            severity: warning
-```
-
-**`kubectl apply -f prom-rule.yaml`**
-
-### Monitor Wordpress
-
-To monitor the wordpress application, you would need a Prometheus exporter for the PHP layer.
-
-A low cost alternative is to use the [Blackbox exporter](https://github.com/prometheus/blackbox_exporter) to perform HTTP checks.
-
-#### Deploy the black box exporter
-
-To perform health checks, you need to deploy a Blackbox exporter infratructure.
-
-For that, use the community [Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-blackbox-exporter). The default Helm chart configurations will activate the http_2xx module, which is sufficient for our case.
-
-If you run:
 
 ```sh
-helm show values prometheus-community/prometheus-blackbox-exporter --jsonpath='{.config}'|jq ''
+training@bastion:~$ kubectl apply -f mongodb-cluster.yaml -n application
 ```
 
-You will get:
-
-```json
-{
-  "modules": {
-    "http_2xx": {
-      "http": {
-        "follow_redirects": true,
-        "preferred_ip_protocol": "ip4",
-        "valid_http_versions": [
-          "HTTP/1.1",
-          "HTTP/2.0"
-        ]
-      },
-      "prober": "http",
-      "timeout": "5s"
-    }
-  }
-}
-```
-
-Yet, Blackbox exporter supports other modules. See the [configuration example](https://github.com/prometheus/blackbox_exporter/blob/master/example.yml).
-
-Deploy the chart inside the `bbox-exporter` namespace:
+- Once the cluster is ready again, you can look at what kind of metrics are exported
 
 ```sh
-helm upgrade --install bbox-exporter prometheus-community/prometheus-blackbox-exporter --namespace bbox-exporter --create-namespace
+training@bastion:~$ kubectl -n application port-forward svc/mongodb-cluster-svc 9216
+# Query the metrics endpoint to see what is gathered
+training@bastion:~$ curl http://prometheus:password@localhost:9216/metrics
 ```
 
-With `kubectl`, retrieve the Blackbox exporter service name.
-
-You can now use this Blackbox infrasructure to run HTTP tests on `google.com`:
+- Now, you must instruct Prometheus to scrape the metrics. To do that, create a [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#servicemonitor) by completing the [mongodb-servicemonitor.yaml](./mongodb-servicemonitor.yaml) file.
 
 ```sh
-kubectl run test -ti --image=busybox -- sh
-# Inside the pod
-wget -O- http://bbox-exporter-prometheus-blackbox-exporter.bbox-export.svc.cluster.local:9115/probe?target=google.com
+training@bastion:~$ kubectl apply -f mongodb-servicemonitor.yaml -n application
 ```
 
-#### Add an HTTP Probe to monitor the wordpress service
+- Wait a minute and check the **Targets Health** tab on Prometheus. You should see your MongoDB instances appear
 
-The last step is to create a [Probe](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#probe) resource to tell Prometheus to call the blackbox exporter service with a specific target - your Wordpress URL.
+- Import the Grafana dashboard defined in the [mongodb-dashboard.json](./mongodb-dashboard.json) file directly from the Grafana UI (Dashboards tab -> New -> Import -> Paste the json content). Ensure it works well.
 
-Complete the following snippet:
+- We will now create a [PrometheusRule](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#prometheusrule) to be alerted when one or more instances from our MongoDB cluster are missing. Complete the [mongodb-prometheusrule.yaml](./mongodb-prometheusrule.yaml) file and create the resource.
+
+```sh
+training@bastion:~$ kubectl apply -f mongodb-prometheusrule.yaml -n application
+```
+
+- After a few seconds, you should see your alert on the Prometheus UI. You can play with the MongoDB replicas to see if your alert fires.
+
+### Admin UI
+
+Now, we will use the Blackbox exporter to perform health checks on our admin UI.
+
+Blackbox exporter supports differents modules to perform checks. See the [configuration example](https://github.com/prometheus/blackbox_exporter/blob/master/example.yml).
+
+In our case, we will focus on HTTP checks.
+
+- Deploy the chart inside the `blackbox-exporter` namespace:
+
+```sh
+training@bastion:~$ helm upgrade --install blackbox-exporter prometheus-community/prometheus-blackbox-exporter --namespace blackbox-exporter --create-namespace
+```
+
+- Inspect the configmap to see which modules are enabled by default
+
+- We can now test the exporter by running a manual HTTP test against `google.com`
+
+```sh
+training@bastion:~$ kubectl exec deploy/front-admin -n application -- curl "http://blackbox-exporter-prometheus-blackbox-exporter.blackbox-exporter.svc.cluster.local:9115/probe?target=google.com"
+# Inspect the output to see the exported metrics
+```
+
+- It's time to monitor our admin UI ! This is done with a [Probe](https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#probe) resource to tell Prometheus to call the blackbox exporter service with a specific target
 
 ```yaml
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
 metadata:
-  name: wordpress-website
-  namespace: wordpress
+  name: front-admin
+  namespace: application
 spec:
-  interval: 60s
+  interval: 30s
   module: http_2xx
   prober:
-    url: BBOX_INTERNAL_SERVICE_DNS:BBOX_PORT
+    url: blackbox-exporter-prometheus-blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
   targets:
     staticConfig:
       static:
-        - http://PUBLIC_DNS_OF_YOUR_CLUSTER:NODE_PORT_NUMBER/
+        - https://demo-admin.k8s-ops-X.wescaletraining.fr
 ```
 
-Create this probe.
+- Wait 1 minute and check that the new probe is visible in the Prometheus targets
 
-**Edit the port in blackbox-exporter-probe.yml. Then:**
-**`kubectl apply -f blackbox-exporter-probe.yml`**
+- Check the `probe_success` metric to see if your probe works. Is it the case ?
 
-Then wait 1 minute to check the `wordpress-website` target is visible in `/targets` endpoint of your Prometheus (http://prometheus.k8s-ops-X.wescaletraining.fr)
+> The probe_success metric shows "0" which means that it is not successful
 
-Finally, consult the returned metrics opening `http://prometheus.k8s-ops-X.wescaletraining.fr/graph?g0.expr=%7Bjob%3D%22probe%2Fwordpress%2Fwordpress-website%22%7D&g0.tab=1&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h`. Replace the `-X` with your cluster number.
-
-To create an alert, create a new PrometheusRule for the `up{job="probe/wordpress/wordpress-website", namespace="wordpress"}`.
-
-**`kubectl apply -f prom-rule-wordpress.yaml`**
-
-## Clean
+- Troubleshoot this by executing the probe manually in debug mode
 
 ```sh
-helm uninstall bbox-exporter --namespace bbox-exporter
-helm uninstall kube-prometheus-stack --namespace monitoring
-kubectl delete ns bbox-exporter
-kubectl delete ns monitoring
-kubectl delete ns wordpress
+training@bastion:~$ kubectl exec deploy/front-admin -n application -- curl "http://blackbox-exporter-prometheus-blackbox-exporter.blackbox-exporter.svc.cluster.local:9115/probe?target=demo-admin.k8s-ops-X.wescaletraining.fr&debug=true"
+# Inspect the log lines to try to pinpoint the issue
+...
+# In the logs we can see that the certificate is not valid so the request cannot be validated
+ts=2025-03-10T12:10:45.108634951Z caller=handler.go:120 module=http_2xx target=demo-admin.k8s-ops-0.wescaletraining.fr level=error msg="Error for HTTP request" err="Get \"https://demo-admin.k8s-ops-0.wescaletraining.fr\": tls: failed to verify certificate: x509: certificate is valid for ingress.local, not demo-admin.k8s-ops-0.wescaletraining.fr"
 ```
 
-Because CRDs are not deleted when uninstalling the helm release, manual deletion must be done:
+- Make the necessary change on the blackbox exporter configuration to make our probe work
+
+> Ideally we would regenerate a certificate that is publicly valid for our demo-admin.k8s-ops-0.wescaletraining.fr FQDN. But this requires an additional setup that does not really serve any purpose here. Instead we are going to skip TLS verification at the blackbox exporter level (do not do that in production)
 
 ```sh
-kubectl delete crd alertmanagerconfigs.monitoring.coreos.com
-kubectl delete crd alertmanagers.monitoring.coreos.com
-kubectl delete crd podmonitors.monitoring.coreos.com
-kubectl delete crd probes.monitoring.coreos.com
-kubectl delete crd prometheuses.monitoring.coreos.com
-kubectl delete crd prometheusrules.monitoring.coreos.com
-kubectl delete crd servicemonitors.monitoring.coreos.com
-kubectl delete crd thanosrulers.monitoring.coreos.com
+training@bastion:~$ kubectl apply -f blackbox-exporter-configmap.yaml -n blackbox-exporter
+```
+
+- Restart the blackbox exporter. The probe should now be successful !
+
+```sh
+training@bastion:~$ kubectl rollout restart deploy/blackbox-exporter-prometheus-blackbox-exporter -n blackbox-exporter
 ```

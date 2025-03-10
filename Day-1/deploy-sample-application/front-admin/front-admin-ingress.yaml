@@ -7,10 +7,11 @@ metadata:
     app: microservices-demo
     component: front-admin
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   rules:
-  - host: demo-admin.k8s-ops-0.wescaletraining.fr
+  - host: demo-admin.k8s-ops-X.wescaletraining.fr
     http:
       paths:
       - backend:
@@ -27,3 +28,7 @@ spec:
               number: 8080
         path: /article/
         pathType: Prefix
+  tls:
+  - hosts:
+    - demo-admin.k8s-ops-X.wescaletraining.fr
+    secretName: demo-admin-tls

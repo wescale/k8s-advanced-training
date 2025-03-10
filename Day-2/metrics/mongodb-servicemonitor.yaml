@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mongodb-cluster
+  namespace: application
+spec:
+  endpoints:
+  - basicAuth:
+      password:
+        key: #SET VALUE HERE#
+        name: #SET VALUE HERE#
+      username:
+        key: #SET VALUE HERE#
+        name: #SET VALUE HERE#
+
+    port: #SET VALUE HERE#
+    scheme: http
+  selector:
+    matchLabels:
+      app: #SET VALUE HERE#

@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mongodb-cluster
+  namespace: application
+spec:
+  groups:
+    - name: mongodb
+      rules:
+        - alert: NoRunningMongoDB
+          annotations:
+            description: MongoDB targets are down.
+            summary: MongoDB targets are down
+          # Hint: use the `up` metric with some filter(s) applied
+          expr: up{job="mongodb-cluster-svc", namespace="application"} == 0
+          for: 0m
+          labels:
+            severity: warning

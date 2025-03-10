@@ -42,7 +42,7 @@ training@bastion:~$ kubectl explain mongodbcommunity.spec
   - Create a user called `training` who is cluster admin. You can freely choose the associated password
 
 ```sh
-training@bastion:~$ kubectl create secret mongodb-training-password --from-litteral password=password -n application
+training@bastion:~$ kubectl create secret generic mongodb-training-password --from-literal password=password -n application
 training@bastion:~$ kubectl apply -f mongodb-cluster.yaml -n application
 ```
 

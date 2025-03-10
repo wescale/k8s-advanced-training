@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mongodb-cluster
+  namespace: application
+spec:
+  endpoints:
+  - basicAuth:
+      password:
+        key: password
+        name: mongodb-metrics-credentials
+      username:
+        key: username
+        name: mongodb-metrics-credentials
+
+    port: prometheus
+    scheme: http
+  selector:
+    matchLabels:
+      app: mongodb-cluster-svc

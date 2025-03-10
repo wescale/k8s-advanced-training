@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blackbox-exporter-prometheus-blackbox-exporter
+  namespace: blackbox-exporter
+data:
+  blackbox.yaml: |
+    modules:
+      http_2xx:
+        http:
+          follow_redirects: true
+          preferred_ip_protocol: ip4
+          tls_config:
+            insecure_skip_verify: true
+          valid_http_versions:
+          - HTTP/1.1
+          - HTTP/2.0
+        prober: http
+        timeout: 5s

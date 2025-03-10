@@ -25,7 +25,7 @@ spec:
             secretKeyRef:
               key: connectionString.standard
               name: mongodb-cluster-admin-training
-        image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/article-service:1.0.0
+        image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/article-service:2.0.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
