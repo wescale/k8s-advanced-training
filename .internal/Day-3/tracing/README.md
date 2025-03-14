@@ -21,7 +21,14 @@ training@bastion:~$ watch kubectl po -n tracing
 
 - Take a look at the configuration in the `tempo` configmap.
   - What protocol(s) can be used to push traces to Tempo ?
+
+> Jaeger and Opentelemetry on both HTTP and GRPC
+
   - On which ports ?
+
+> Jaeger: GRPC => 14250 and HTTP => 14268
+
+> Opentelemetry: GRPC => 4317 and HTTP => 4318
 
 - Add a Tempo datasource in Grafana from the `Connections` tab
   - Type: `tempo`
@@ -32,6 +39,8 @@ training@bastion:~$ watch kubectl po -n tracing
 
 - Go on the `Explore` tab and select the `Tempo` datasource to query some traces. Do you see any of them ? Why ?
 
+> No because we don't have any component that is emitting traces.
+
 ## Send our first traces
 
 Now that we have our traces backend deployed and configured, we can configure the `article-service` component to emit spans.
@@ -39,6 +48,10 @@ Now that we have our traces backend deployed and configured, we can configure th
 This can be done by setting the `OTLP_ENDPOINT` environment variable to the Tempo opentelemetry receiver HTTP endpoint. The service will then emit traces for both API and MongoDB calls.
 
 - Configure the `article-service` Deployment to sent traces to Tempo on the `/v1/traces` API endpoint
+
+```sh
+training@bastion:~$ kubectl apply -f article-service-deployment.yaml -n application
+```
 
 - Inspect the logs to see if there are any errors
 
@@ -81,16 +94,35 @@ Now we can enable opentelemetry tracing on the `front-admin` component.
 
 - Edit the `front-admin` configmap to add the `otlpEndpoint` endpoint set to `https://tempo.k8s-ops-X.wescaletraining.fr/v1/traces`
 
+```sh
+training@bastion:~$ kubectl apply -f front-admin-configmap.yaml -n application
+```
+
 - Restart the admin UI pod. If you refresh the page on your browser, you should see a message in the dev console that tracing is enabled.
+
+```sh
+training@bastion:~$ kubectl rollout restart deploy/front-admin -n application
+```
 
 - Generate some traffic again and go take a look at the generated traces on Grafana.
 
 - Find a trace emitted by the `front-admin` and inspect it.
 
   - How many spans are in the trace ?
+
+> 4
+
   - What operations does each one correspond to ?
+
+> HTTP request on `front-admin`, HTTP API request to `article-service`, `GetArticles` function call and `article.find` command on MongoDB
+
   - What is the library used to instrument this application?
+
+> @opentelemetry/instrumentation-fetch
+
   - What version of the opentelemetry SDK is used ?
+
+> 1.30.1
 
 - You can also explore the `front-admin` UI and add an article to see if the traces emitted are different than the one you just inspected
 

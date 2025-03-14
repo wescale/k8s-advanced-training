@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: microservices-demo
+    component: front-admin
+  name: front-admin
+  namespace: application
+data:
+  endpoints.json: |-
+    {
+      "apiArticlesEndpoint": "article",
+      "otlpEndpoint": "https://tempo.k8s-ops-0.wescaletraining.fr/v1/traces"
+    }

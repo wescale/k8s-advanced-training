@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  name: tempo
+  namespace: tracing
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: tempo.k8s-ops-0.wescaletraining.fr
+    http:
+      paths:
+      - backend:
+          service:
+            name: tempo
+            port:
+              number: 4318
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - tempo.k8s-ops-0.wescaletraining.fr
+    secretName: tempo-tls

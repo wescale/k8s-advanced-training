@@ -25,6 +25,8 @@ spec:
             secretKeyRef:
               key: connectionString.standard
               name: mongodb-cluster-admin-training
+        - name: OTLP_ENDPOINT
+          value: http://tempo.tracing.svc.cluster.local:4318/v1/traces
         image: europe-west1-docker.pkg.dev/wsc-kubernetes-training-0/microservices-demo/front-admin:2.0.3
         imagePullPolicy: IfNotPresent
         livenessProbe:
